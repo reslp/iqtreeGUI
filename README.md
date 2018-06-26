@@ -1,13 +1,13 @@
 iqtreeGUI
 =========
 
-This repository contains source code and executables of a Graphic User Interface for [IQ-TREE] (www.iqtree.org). 
+This repository contains source code and executables of a Graphic User Interface for [IQ-TREE](www.iqtree.org). 
  
 
 Description
 ===========
 
-iqtreeGUI is a graphical front-end for [IQ-TREE] (www.iqtree.org). The goal is to implement all features of IQ-TREE 1.6.1. It is under active development and so several features are still missing (eg. a GUI for likelihood mapping, topology tests). iqtreeGUI is written in Python. Executables are created with pyinstaller.
+iqtreeGUI is a graphical front-end for [IQ-TREE](www.iqtree.org). The goal is to implement all features of IQ-TREE 1.6.1. It is under active development and so several features are still missing (eg. a GUI for likelihood mapping, topology tests). iqtreeGUI is written in Python. Executables are created with pyinstaller.
 
 ![Screenshot of iqtreeGUI](screenshot.png)
 *Figure: iqtreeGUi running on MacOS High Sierra*
@@ -38,11 +38,12 @@ Obtaining and configuring iqtreeGUI
 ================
 Executables are available for Linux, MacOS and Windows. The Windows and Linux versions were built using a combination of Docker and pyinstaller. 
 
-For iqtreeGUI to work you will also need to download and install [IQ-TREE] (www.iqtree.org). Once you have started iqtreeGUI you will have to set the correct path to the IQ-TREE executable. Click on iqtree-GUI -> GUI settings and select the iqtree executable.
+For iqtreeGUI to work you will also need to download and install [IQ-TREE](www.iqtree.org). Once you have started iqtreeGUI you will have to set the correct path to the IQ-TREE executable. Click on iqtree-GUI -> GUI settings and select the iqtree executable.
 
 
 Building executables
 ===================
+If you are on Linux or MacOS you may execute the `build_all.sh` script to build iqtreeGUI for Linux, MacOS and Windows. This requires pyinstaller and Docker to be installed.
 
 **Locally from source:**
 
