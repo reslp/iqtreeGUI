@@ -278,9 +278,7 @@ class iqtree_GUI:
 					self.alignments[-1].grid(sticky=W)
 					self.align_offset += 30
 				self.alignment_scroll_frame.update()
-				self.alignment_info_label.config(text="Alignments: %s Alignment(s) loaded" % str(len(self.alignments)))
-
-			
+				self.alignment_info_label.config(text="Alignments: %s Alignment(s) loaded" % str(len(self.alignments)))	
 			if child.tag == "partitions":
 				self.part_set_frame_container.lift(self.partition_layer)
 				self.button_create_part.lift(self.partition_layer)
@@ -662,34 +660,36 @@ class iqtree_GUI:
 					i += 1
 				partition_command +="end;\n"
 			
-			### multiple alignments, multiple partitions, modeltest = models per alignment
+			### multiple alignments, multiple partitions, modeltest = models per alignment (modeltest)
 			elif len(self.align_partitions) >= 1 and self.choice_model_option == 1:
 				print "muliple alignments, multiple partitions, modeltest"
 				command += self.advanced_model_settings.get_command() #first add model testing option to run command
 				partition_command="#NEXUS\nbegin sets;\n"
 				i = 1
-				for alignment in self.alignments:
-					partition_command += "charset part" + str(i) + "= "+alignment.alignment_path + ":"
-					for partition in self.align_partitions:
-						if partition.get_which_alignment() == alignment.alignment_no:
-							partition_command += " "+ str(partition.get_start()) +"-" +str(partition.get_end())
-					partition_command += ";\n"
+				for partition in self.align_partitions:
+					alignment = self.alignments[partition.get_which_alignment()-1]
+					partition_command += "charset part" + str(i) + "="+alignment.alignment_path + ":" + " " + str(partition.get_start()) +"-" +str(partition.get_end()) +";\n"
 					i += 1
+				for alignment in self.alignments:
+					if alignment.alignment_path not in partition_command:
+						partition_command += "charset part" + str(i) + "="+alignment.alignment_path + ":" + " *;\n"
+						i +=1 
 				partition_command +="end;\n"	
 				
 			### multiple alignments, multiple partitions, models per partition
 			elif len(self.align_partitions) >= 1 and self.choice_model_option == 2:
-				print "muliple alignments, multiple partitions, modeltest"
+				print "muliple alignments, multiple partitions, models per partition"
 				command += self.advanced_model_settings.get_command() #first add model testing option to run command
 				partition_command="#NEXUS\nbegin sets;\n"
 				i = 1
-				for alignment in self.alignments:
-					partition_command += "charset part" + str(i) + "= "+alignment.alignment_path + ":"
-					for partition in self.align_partitions:
-						if partition.get_which_alignment() == alignment.alignment_no:
-							partition_command += " "+ str(partition.get_start()) +"-" +str(partition.get_end())
-					partition_command += ";\n"
+				for partition in self.align_partitions:
+					alignment = self.alignments[partition.get_which_alignment()-1]
+					partition_command += "charset part" + str(i) + "="+alignment.alignment_path + ":" + " " + str(partition.get_start()) +"-" +str(partition.get_end()) +";\n"
 					i += 1
+				for alignment in self.alignments:
+					if alignment.alignment_path not in partition_command:
+						partition_command += "charset part" + str(i) + "="+alignment.alignment_path + ":" + " *;\n"
+						i +=1 
 				## second add models:
 				model_string = "charpartition mine = "
 				print "found partitions: %s" % len(self.model_partitions)
@@ -697,13 +697,13 @@ class iqtree_GUI:
 					model = self.model_partitions[i].get_model()
 					print model
 					if "invalid" in model:
-						tkMessageBox.showerror("Error", "Specified model for Partition " + str(i+1))
+						tkMessageBox.showerror("Error", "Check model for Partition " + str(i+1))
 						break
 					else:
 						model_string += model
 						model_string +=":part%s," % str(i+1)
 				partition_command += model_string.strip(",")
-				partition_command +="\nend;\n"
+				partition_command +=";\nend;\n"
 			
 			#### to here all for multiple partitions
 				

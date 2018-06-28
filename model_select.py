@@ -235,7 +235,7 @@ class ModelSelection(Frame):
 	
 		self.base_model_select = OptionMenu(self, self.v_model,  *base_model_options, command=cbBaseModel)
 		
-		base_freq_options = ["+F ", "+FQ", "+FO", "FIX"]
+		base_freq_options = ["+F", "+FQ", "+FO", "FIX"]
 		
 		self.v_base_freq=StringVar()
 		self.v_base_freq.set(self.model.base_freq)
@@ -395,13 +395,11 @@ class ModelSelection(Frame):
 			print which
 		self.morph_type_select = OptionMenu(self, morph_type_v,  *morph_model_options, command=ShowChoice_morph_type)
 				
-		rate_hetero_options = ["+I", "+G", "+I+G", "+R", "+I+R"]
+		rate_hetero_options = ["Rate Heterog.", "+I", "+G", "+I+G", "+R", "+I+R"]
 		self.rate_hetero_v=StringVar()
 		self.rate_hetero_v.set(self.model.rate_hetero)
 		
 		def ShowChoice_rate_hetero(which):
-			self.rate_hetero = which
-			self.model.rate_hetero = which
 			if which == "FIX":
 				self.rate_hetero_user_scheme.grid(row=0,column=8) #needs to be changed to lift when this is activated
 			else:
@@ -419,13 +417,15 @@ class ModelSelection(Frame):
 
 	def get_model(self): #this will be the function to return which model is used
 		print "Returning model..."
+		if self.model.rate_hetero=="Rate Heterog.":
+			self.model.rate_hetero = ""
 		if self.model.data_type == "DNA":
 			if self.model.model_type == "Base substitution rates":
 				model = self.model.model + self.model.base_freq + self.model.rate_hetero
 				print "Model will be: %s" % model
 				return model
 			if self.model.model_type == "Lie Markov models":
-				if self.model.li_model_prefix == "Prefix":
+				if self.model.li_model_prefix == "Prefix" or self.model.li_model_prefix == "None":
 					model = self.model.model + self.model.rate_hetero
 				else: 
 					model = self.model.li_model_prefix + self.model.model + self.model.rate_hetero
