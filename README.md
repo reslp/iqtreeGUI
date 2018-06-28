@@ -1,7 +1,7 @@
 iqtreeGUI
 =========
 
-This repository contains source code and executables of a Graphic User Interface for [IQ-TREE](www.iqtree.org). 
+This repository contains source code and executables for a graphical user interface for [IQ-TREE](www.iqtree.org). 
  
 
 Description
