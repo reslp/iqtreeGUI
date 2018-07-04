@@ -19,7 +19,7 @@ One of the great things about IQ-TREE is that is has lots of possibilities to co
 Features
 ===========
 
-iqtreeGUI amis to implement all features of IQ-TREE v1.6.1 
+iqtreeGUI aims to implement all features of IQ-TREE v1.6.1 
 
 Currently implemented features:
 
