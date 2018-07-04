@@ -100,11 +100,8 @@ class IqtreeWindow():
 		
 	def spawn_process(self):
 		print "Command is:", self.command
-		cmd_list = shlex.split(self.command)
-		print "Command list:", cmd_list
-		cmd_list[0] = "~/bin/iqtree"
-		print "Command list:", cmd_list
-		self.process = Popen(self.command, stdout=PIPE, stderr=STDOUT, universal_newlines=True, shell=True, cwd=self.settings.wd)
+		#cmd_list = shlex.split(self.command)
+		self.process = Popen(self.command, stdout=PIPE, stderr=STDOUT, universal_newlines=True, shell=True)
 		#self.process = Popen("iqtree", stdout=PIPE, stderr=STDOUT, universal_newlines=True, shell=False, cwd=self.settings.wd)
 
 		q = Queue(maxsize=1024)

@@ -542,7 +542,13 @@ class iqtree_GUI:
 		add_cmd += self.advanced_bs_settings.get_command()
 		add_cmd += self.treesearch_settings.get_command()
 		return add_cmd
-	
+	######################################################################################
+	#																					 #
+	#																					 #
+	#								Create iqtree command								 #
+	#																					 #
+	#																					 #
+	######################################################################################
 	def get_run_command_new(self):
 		print "creating run command"
 		print "Alignments: %d " % len(self.alignments)
@@ -577,37 +583,37 @@ class iqtree_GUI:
 		### if there is only a single alignment:
 		elif len(self.alignments) == 1:
 			print "single alignment"
-			partition_command=""
 			## add model parameters for single partition:
 			if self.choice_part_option == 1:	
+				partition_command="#NEXUS\nbegin sets;\n"
+				partition_command += "charset part1="+self.alignments[0].alignment_path+":*;\n"
 				# check for different model options
-				if self.choice_model_option == 1:
-					command += self.advanced_model_settings.get_command()
+				if self.choice_model_option == 1: # if automatic model selection is specified
+					partition_command += "end;\n"
 				if self.choice_model_option == 2:
 					if "invalid" in self.model_partitions[0].get_model():
 						tkMessageBox.showerror("Error", "Specified model for Partition 1 " + self.model_partitions[0].get_model())
 					else:
-						if ("CODON" in self.model_partitions[0].get_model()): #handly codon models differently
-							command += "-st " + self.model_partitions[0].get_model()+" "
-						else:
-							command += "-m " + self.model_partitions[0].get_model()+" "
-						print self.model_partitions[0].model.__dict__
+						partition_command += "charpartition mine = " + self.model_partitions[0].get_model() +":part1;"
 			## add model parameters for multiple partition	
 			if self.choice_part_option == 2:
-		
+				
 				# check for different model options
 				## if modeltest should be used
 				if self.choice_model_option == 1:
-					command += self.advanced_model_settings.get_command()
-
+					partition_command="#NEXUS\nbegin sets;\n"
+					partition_command += "charset part1="+self.alignments[0].alignment_path+";"
+					partition_command += "\nend;\n"
 				## add parameters for multiple partition:
 				## if there are multiple partitions and models			
 				if self.choice_model_option == 2:
+					print "single alignment, multiple partitions and models"
 					partition_command="#NEXUS\nbegin sets;\n"
 					## first get partition boundaries:
+					partition_command += "charset part1="+self.alignments[0].alignment_path+":"
 					for part in range(0,len(self.align_partitions)):
-						partition_command += "charset part"+str(part+1) +"= "+str(self.align_partitions[part].get_start())+ "-"+str(self.align_partitions[part].get_end())+";\n"
-				
+						partition_command += " " + str(self.align_partitions[part].get_start())+ "-"+str(self.align_partitions[part].get_end())
+					partition_command += ";\n"
 					## second add models:
 					model_string = "charpartition mine = "
 					print "found partitions: %s" % len(self.model_partitions)
@@ -625,23 +631,13 @@ class iqtree_GUI:
 					model_string += ";\nend;\n"
 					partition_command += model_string
 					print partition_command
-				if self.choice_model_option == 1 and len(self.align_partitions)>1:
+				if self.choice_model_option == 1 and len(self.align_partitions)>1: #if there is automatic model selection
 					partition_command="#NEXUS\nbegin sets;\n"
+					partition_command += "charset part1="+self.alignments[0].alignment_path+":"
 					## first get partition boundaries:
 					for part in range(0,len(self.align_partitions)):
-						partition_command += "charset part"+str(part+1) +"= "+str(self.align_partitions[part].get_start())+ "-"+str(self.align_partitions[part].get_end())+";\n"
-					partition_command += "end;\n"
-			
-			## add alignment (only if there is 1 alignment)
-			if self.filename != "":
-				command += "-s "
-				command += self.alignments[0].alignment_path
-			else:
-				tkMessageBox.showerror("Error", "No alignment loaded")
-				return
-			if self.overwrite == 1:
-				command += " -redo "	
-				self.partition_command = partition_command
+						partition_command += " " + str(self.align_partitions[part].get_start())+ "-"+str(self.align_partitions[part].get_end())
+					partition_command += "\nend;\n"
 
 		### if there are multiple alignments
 		elif len(self.alignments) > 1:
@@ -652,7 +648,7 @@ class iqtree_GUI:
 			### multiple alignments, no partitions, modeltest = models per alignment
 			if len(self.align_partitions) == 0 and self.choice_model_option == 1:
 				print "multiple alignments, no partitions, modeltest"
-				command += self.advanced_model_settings.get_command() #first add model testing option to run command
+				#command += self.advanced_model_settings.get_command() #first add model testing option to run command
 				partition_command="#NEXUS\nbegin sets;\n"
 				i = 1
 				for alignment in self.alignments:
@@ -663,7 +659,7 @@ class iqtree_GUI:
 			### multiple alignments, multiple partitions, modeltest = models per alignment (modeltest)
 			elif len(self.align_partitions) >= 1 and self.choice_model_option == 1:
 				print "muliple alignments, multiple partitions, modeltest"
-				command += self.advanced_model_settings.get_command() #first add model testing option to run command
+				#command += self.advanced_model_settings.get_command() #first add model testing option to run command
 				partition_command="#NEXUS\nbegin sets;\n"
 				i = 1
 				for partition in self.align_partitions:
@@ -679,7 +675,7 @@ class iqtree_GUI:
 			### multiple alignments, multiple partitions, models per partition
 			elif len(self.align_partitions) >= 1 and self.choice_model_option == 2:
 				print "muliple alignments, multiple partitions, models per partition"
-				command += self.advanced_model_settings.get_command() #first add model testing option to run command
+				#command += self.advanced_model_settings.get_command() #first add model testing option to run command
 				partition_command="#NEXUS\nbegin sets;\n"
 				i = 1
 				for partition in self.align_partitions:
@@ -722,9 +718,14 @@ class iqtree_GUI:
 			else:
 				command += "-spp "+self.gui_settings.wd+"/partitions.nex " #standard	
 		
+		##get additional settings for automatic model selection:
+		if self.choice_model_option == 1:
+			command += self.advanced_model_settings.get_command()
+		
 		## additional settings
 		command += self.get_additional_settings_for_run()
-
+		
+		
 		#repeat analysis
 		if self.overwrite == 1:
 			command += " -redo "	
@@ -737,131 +738,7 @@ class iqtree_GUI:
 		
 		if self.simulate_only == 0:
 			self.spawn_iqtree_subprocess(command)		
-		
-	"""			
-	def get_run_command(self):
-		print "Run analysis"
-		if not os.path.isfile(self.gui_settings.iqtree_path):
-			tkMessageBox.showerror("Error", "IQtree executable not found.\n Is the specified path correct?")
-			return
-		command = self.gui_settings.iqtree_path +" "
-		
-		## get thread number 
-		command += "-nt %s " % str(self.nthreads)
-		
-		## select bootstrap option:
-		if self.choice_bs_option == 2:
-			try:
-				int(self.entry_bs.get())
-				command += "-b %s " % self.entry_bs.get()
-			except:
-				tkMessageBox.showerror("Error", "Not a valid number of bootstrap replicates.")
-				return
-				
-		if self.choice_bs_option == 3:
-			try:
-				int(self.entry_bs.get())
-				command += "-bb %s " % self.entry_bs.get()
-			except:
-				tkMessageBox.showerror("Error", "Not a valid number of bootstrap replicates.")
-				return
-				
-		partition_command=""
-		## add model parameters for single partition:
-		if self.choice_part_option == 1:	
-			# check for different model options
-			if self.choice_model_option == 1:
-				command += self.advanced_model_settings.get_command()
-			if self.choice_model_option == 2:
-				if "invalid" in self.model_partitions[0].get_model():
-					tkMessageBox.showerror("Error", "Specified model for Partition 1 " + self.model_partitions[0].get_model())
-				else:
-					if ("CODON" in self.model_partitions[0].get_model()): #handly codon models differently
-						command += "-st " + self.model_partitions[0].get_model()+" "
-					else:
-						command += "-m " + self.model_partitions[0].get_model()+" "
-					print self.model_partitions[0].model.__dict__
-		
-		## add model parameters for multiple partition	
-		if self.choice_part_option == 2:
-		
-			# check for different model options
-			## if modeltest should be used
-			if self.choice_model_option == 1:
-				command += self.advanced_model_settings.get_command()
-
-			## add parameters for multiple partition:
-			## if there are multiple partitions and models			
-			if self.choice_model_option == 2:
-				partition_command="#NEXUS\nbegin sets;\n"
-				## first get partition boundaries:
-				for part in range(0,len(self.align_partitions)):
-					partition_command += "charset part"+str(part+1) +"= "+str(self.align_partitions[part].get_start())+ "-"+str(self.align_partitions[part].get_end())+";\n"
-				
-				## second add models:
-				model_string = "charpartition mine = "
-				print "found partitions: %s" % len(self.model_partitions)
-				for i in xrange(0, len(self.model_partitions)):
-					model = self.model_partitions[i].get_model()
-					print model
-					if "invalid" in model:
-						tkMessageBox.showerror("Error", "Specified model for Partition " + str(i+1))
-						break
-					else:
-						model_string += model
-						model_string +=":part%s," % str(i+1)
-						#print self.model_partitions[i].model.__dict__
-				model_string = model_string[:-1]
-				model_string += ";\nend;\n"
-				partition_command += model_string
-				print partition_command
-			if self.choice_model_option == 1 and len(self.align_partitions)>1:
-				partition_command="#NEXUS\nbegin sets;\n"
-				## first get partition boundaries:
-				for part in range(0,len(self.align_partitions)):
-					partition_command += "charset part"+str(part+1) +"= "+str(self.align_partitions[part].get_start())+ "-"+str(self.align_partitions[part].get_end())+";\n"
-				partition_command += "end;\n"
-		
-		## check for partition command and adjust
-		if partition_command != "":
-			file = open(self.gui_settings.wd+"/partitions.nex", "w")
-			file.write(partition_command)
-			file.close()
-			if "(-spp)" in self.partition_model:
-				command += "-spp "+self.gui_settings.wd+"/partitions.nex "
-			elif "(-q)" in self.partition_model:
-				command += "-q "+self.gui_settings.wd+"/partitions.nex "
-			elif "(-sp)" in self.partition_model:
-				command += "-sp "+self.gui_settings.wd+"/partitions.nex "
-			else:
-				command += "-spp "+self.gui_settings.wd+"/partitions.nex " #standard	
-		
-		## add alignment
-		if self.filename != "":
-			command += "-s "
-			command += self.filename 
-		else:
-			tkMessageBox.showerror("Error", "No alignment loaded")
-			return
-		
-		if self.overwrite == 1:
-			command += " -redo "	
-		self.partition_command = partition_command
-		
-		
-		## additional settings
-		command += self.get_additional_settings_for_run()
-		
-	
-		## make sure the command looks good
-		print partition_command
-		print command
-		# self.info_label.insert(END, self.get_time()+"iqtree command will be: "+command+"\n")
-		
-		if self.simulate_only == 0:
-			self.spawn_iqtree_subprocess(command)
-	"""
-				
+					
 	def spawn_iqtree_subprocess(self, command):	
 		iqtree_out_window=Toplevel(self.master)
 		iqtree_out = IqtreeWindow(iqtree_out_window, self.gui_settings)
@@ -879,7 +756,7 @@ class iqtree_GUI:
 		try:
 			config.read(self.config_path)
 			self.gui_settings.iqtree_path = config.get('Settings', 'iqtree')
-			#self.gui_settings.wd = config.get('Settings', 'wd')
+			self.gui_settings.wd = config.get('Settings', 'wd')
 		except:
 			tkMessageBox.showerror("Error", "Config file error")
 			return
@@ -991,7 +868,7 @@ class iqtree_GUI:
 		
 		#welcome_message = "_       __                 ________  ______\n (_)___ _/ /_________  ___  / ____/ / / /  _/\n/ / __ `/ __/ ___/ _ \/ _ \/ / __/ / / // /  \n/ / /_/ / /_/ /  /  __/  __/ /_/ / /_/ // /   \n/_/\__, /\__/_/   \___/\___/\____/\____/___/   \n/_/"
 			         
-		message = "iqtreeGUI - A graphical user interface for IQ-TREE.\n\nhttp://github.com/reslp/iqtree\n\nVersion %s \n\n" % self.gui_settings.version
+		message = "iqtreeGUI - A graphical user interface for IQ-TREE.\n\nhttp://github.com/reslp/iqtreegui\n\nVersion %s \n\n" % self.gui_settings.version
 		self.label = Label(self.info_frame, text=message)
 		self.label.configure(font="Helvetica 14 bold")
 		self.label.config(justify=LEFT)
@@ -1033,7 +910,7 @@ class iqtree_GUI:
 			config.add_section('Settings')
 			config.set('Settings', 'iqtree', self.gui_settings.iqtree_path)
 			config.set('Settings', 'version', self.gui_settings.version)
-			#config.set('Settings', 'wd', self.gui_settings.wd)
+			config.set('Settings', 'wd', self.gui_settings.wd)
 			config.write(configfile)
 			configfile.close()
 			print "config file not found"
@@ -1041,12 +918,7 @@ class iqtree_GUI:
 		else:
 			self.read_config_file()
 			
-		
-		# self.info_label.insert(END, "Version Alpha " +self.gui_settings.version+"\n\n")
-		# self.info_label.insert(END, self.get_time()+"Configuration file loaded\n")
-		# self.info_label.insert(END, self.get_time()+"Specified path to iqtree command is: "+ self.gui_settings.iqtree_path +"\n")
-		# self.info_label.insert(END, self.get_time()+"Start by loading an alignment...\n")
-		
+				
 		self.notebook.add(self.info_frame, text="Info")
 
 
@@ -1061,63 +933,17 @@ class iqtree_GUI:
 		self.alignment_frame.grid_rowconfigure(4,weight=1)
 		self.alignment_frame.grid_columnconfigure(1,weight=1)
 
-		
 		self.description = tk.Label(self.alignment_frame,text="Specify alignment files (FASTA, PHYLIP, NEXUS) here: ", justify=tk.LEFT)
 		self.description.configure(font="Helvetica 14 bold")
 		self.description.grid(row=1,column=1, sticky=W)
 		
-
-		
-		## create alignment button
 		self.load_alignment_button = Button(self.alignment_frame)
 		self.load_alignment_button.grid(row=2,column=1,sticky=W)
 		self.load_alignment_button.configure(text="Add alignment", command=self.add_alignment)
 		
-		
 		self.alignment_frame_container = Frame(self.alignment_frame)
 		self.alignment_frame_container.grid(row=4, column=1, columnspan=10, sticky=N+S+W+E)
 		self.alignment_scroll_frame = ScrollableFrame(self.alignment_frame_container)
-		
-		
-		
-		#self.alignment_test_var = IntVar()
-		#self.alignment_test_var.set(0)
-		
-		#self.test_alignment = tk.Checkbutton(self.alignment_frame, text="Basic alignment check", variable=self.alignment_test_var)
-		#self.test_alignment.grid(row=3,column=1, sticky=W)
-		
-		#self.alingnment_info_label = Label(self.alignment_frame)
-		#self.alingnment_info_label.grid(row=0,column=1,sticky=W)
-		#self.alingnment_info_label.configure(text="No alignment loaded")
-		
-		#self.alignment_text_frame = Frame(self.alignment_frame)
-		#self.alignment_text_frame.grid(sticky=N+S+W+E, columnspan=5)
-		#self.alignment_text_frame.grid_rowconfigure(0, weight=1)
-		#self.alignment_text_frame.grid_columnconfigure(0, weight=1)
-		#self.alignment_text_frame.configure(relief=GROOVE, borderwidth=1)
-		
-		# create scrollbars and attach to grid
-		#self.xscroll = Scrollbar(self.alignment_text_frame, orient=HORIZONTAL)
-		#self.xscroll.grid(row=1,column=0, sticky=E+W)		
-		#self.yscroll = Scrollbar(self.alignment_text_frame, orient=VERTICAL)
-		#self.yscroll.grid(row=0,column=1, sticky=N+S)
-		
-		# create alignment view and attach to grid
-		#self.alignment_view = Text(self.alignment_text_frame, xscrollcommand=self.xscroll.set, yscrollcommand=self.yscroll.set)
-		#self.alignment_view.configure(background="white")
-		#self.alignment_view.configure(font=("TkTextFont", 11))
-		#self.alignment_view.configure(selectbackground="#c4c4c4")
-		#self.alignment_view.configure(width=90, bd=5)
-		#self.alignment_view.configure(wrap=NONE)
-		#self.alignment_view.insert(END, "No alignment loaded")
-		#self.alignment_view.grid(row=0,column=0, sticky=N+S+W+E)
-		
-		# connect scrolling functionality
-		#self.yscroll.config(command=self.alignment_view.yview)
-		#self.xscroll.config(command=self.alignment_view.xview)
-		
-		# attach frame to notebook
-		
 		
 		self.notebook.add(self.alignment_frame, text="Alignment")
 			
@@ -1129,16 +955,13 @@ class iqtree_GUI:
 		self.partition_option_frame.configure(relief=GROOVE)
 		self.partition_option_frame.columnconfigure(0, minsize=30)
 		self.partition_option_frame.rowconfigure(0, minsize=30)
-		
-		
+			
 		self.description_part = Label(self.partition_option_frame,text="Specify partitions: ", justify=LEFT)
 		self.description_part.configure(font="Helvetica 14 bold")
 		self.description_part.grid(row=1,column=1, sticky=W)
 
-		
 		self.partition_layer = Label(self.partition_option_frame)
 		self.partition_layer.grid(row=2,column=1,rowspan=20, columnspan=20, sticky=N+S+W+E)
-		
 		
 		self.part_set_frame_container = Frame(self.partition_option_frame)
 		self.part_set_frame_container.grid(row=4, column=2, columnspan=5, sticky=N+W+S+E)
@@ -1160,7 +983,6 @@ class iqtree_GUI:
 		self.button_create_part.lower(self.partition_layer)
 		self.button_delete_part.lower(self.partition_layer)
 		
-		
 		partition_options = [("single partition",1),("multiple partitions",2)]
 		
 		self.part_var=IntVar()
@@ -1168,7 +990,6 @@ class iqtree_GUI:
 	
 		self.small_part_subframe = Frame(self.partition_option_frame)
 		self.small_part_subframe.grid(row=2,column=1)
-		
 		
 		def ShowChoice_part():
 			self.choice_part_option=self.part_var.get()

@@ -78,30 +78,29 @@ class SettingsWindow():
 		self.change_but = tk.Button(self.settings_frame, text="Change", command=self.load_iqtree)
 		self.change_but.grid(row=3, column=3)
 		
-		self.label_wd = tk.Label(self.settings_frame, text="Working directory: Directory of alignment")
+		self.label_wd = tk.Label(self.settings_frame, text="Working directory:")
 		self.label_wd.grid(row=4,column=1, columnspan=2, sticky=tk.W)
 
 		
-		"""
+		
 		# this is currently not working, iqtree seems to produce output in the alignment directory
 		self.wd_entry = tk.Entry(self.settings_frame)
 		self.wd_entry.insert(tk.END, data.wd)
 		self.change_but_wd = tk.Button(self.settings_frame, text="Change", command=self.load_wd)
-		self.wd_entry.grid(row=2,column=2)
-		self.change_but_wd.grid(row=2, column=3)
-		"""
+		self.wd_entry.grid(row=4,column=2)
+		self.change_but_wd.grid(row=4, column=3)
+		
 		
 		def set_config_file():
 			data.iqtree_path = self.iqtree_path_entry.get()
-			#data.wd = self.wd_entry.get()
+			data.wd = self.wd_entry.get()
 			config = ConfigParser.ConfigParser()
 		
 			configfile = open(self.config_file, 'wb')
 			config.add_section('Settings')
 			config.set('Settings', 'iqtree', data.iqtree_path)
-			#config.set('Settings', 'wd', data.wd)
+			config.set('Settings', 'wd', data.wd)
 			config.set('Settings', 'version', data.version)
-		
 			config.write(configfile)
 			configfile.close()
 			self.master.destroy()

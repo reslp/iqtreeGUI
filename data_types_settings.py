@@ -6,7 +6,7 @@ from os.path import expanduser
 class IQtreeGUIConfig:
 	def __init__(self):
 		self.wd = expanduser("~")
-		self.version = "28062018"
+		self.version = "04072018"
 		self.iqtree_path = "iqtree"
 
 class Model:
