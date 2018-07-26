@@ -404,6 +404,7 @@ class ModelSelection(Frame):
 				self.rate_hetero_user_scheme.grid(row=0,column=8) #needs to be changed to lift when this is activated
 			else:
 				self.rate_hetero_user_scheme.grid_forget()
+			self.model.rate_hetero=which	
 			print which
 		
 		self.rate_hetero_select = OptionMenu(self, self.rate_hetero_v,  *rate_hetero_options, command=ShowChoice_rate_hetero)

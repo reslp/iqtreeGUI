@@ -7,7 +7,7 @@ This repository contains source code and executables for a graphical user interf
 Description
 ===========
 
-iqtreeGUI is a graphical front-end for [IQ-TREE](http://www.iqtree.org). The goal is to implement all features of IQ-TREE 1.6.1. It is under active development and so several features are still missing (eg. a GUI for likelihood mapping, topology tests). iqtreeGUI is written in Python. Executables are created with pyinstaller.
+iqtreeGUI is a graphical front-end for [IQ-TREE](http://www.iqtree.org). The goal is to implement all features of IQ-TREE 1.6.1. It is under active development and therefore several features are still missing (eg. a GUI for likelihood mapping, topology tests). iqtreeGUI is written in Python and executables are available for Windows, Linux and MacOS.
 
 ![Screenshot of iqtreeGUI](screenshot.png)
 *Figure: iqtreeGUi running on MacOS High Sierra*

@@ -213,8 +213,10 @@ class iqtree_GUI:
 			for i in range(0, len(self.model_partitions)):
 				name = "model%d" % i
 				child = ET.SubElement(model_child, name)
+				print self.model_partitions[i].model.__dict__
 				for key, value in self.model_partitions[i].model.__dict__.iteritems():
 					elem = ET.SubElement(child, key)
+					print value
 					elem.text = value
 		else:
 			child = ET.SubElement(model_child, "model0")
@@ -244,7 +246,7 @@ class iqtree_GUI:
 		try:
 			tree = ET.parse(filename) 
 		except:
-			tkMessageBox.showinfo("Error", "Not a valid XML file")
+			tkMessageBox.showinfo("Error", "Not a valid iqtreeGUI XML file")
 			return 
 		root = tree.getroot()
 		
@@ -273,6 +275,11 @@ class iqtree_GUI:
 							self.advanced_model_settings.__dict__[key] = self.convert_number(subelement.text)
 			if child.tag == "alignments": #adjust this for multiple alignment files
 				print "loading alignments"
+				# first remove old alignments
+				for i in range(0,len(self.alignments)):
+					self.alignments[i].grid_forget()
+				self.alignments = []
+				# now load new ones
 				for subelement in child:
 					self.alignments.append(Alignment(self.alignment_scroll_frame, align_id="Alignment "+str(len(self.alignments)+1)+":  ", path = subelement.text, number=len(self.alignments)+1))
 					self.alignments[-1].grid(sticky=W)
@@ -280,6 +287,7 @@ class iqtree_GUI:
 				self.alignment_scroll_frame.update()
 				self.alignment_info_label.config(text="Alignments: %s Alignment(s) loaded" % str(len(self.alignments)))	
 			if child.tag == "partitions":
+				self.align_partitions = []
 				self.part_set_frame_container.lift(self.partition_layer)
 				self.button_create_part.lift(self.partition_layer)
 				self.button_delete_part.lift(self.partition_layer)
@@ -309,29 +317,35 @@ class iqtree_GUI:
 							if pos.tag == "which_alignment":
 								self.align_partitions[-1].part_alignment_var.set("Alignment " + pos.text)
 								self.align_partitions[-1].which_alignment = "Alignment " + pos.text
-			"""
 			if child.tag == "models":
+				for i in range(0,len(self.model_partitions)):
+					self.model_partitions[i].grid_forget()
+				self.model_partitions = []
 				i = 0
 				for subelement in child:
 					if subelement.tag == "model_var":
 						self.v_model_option.set(subelement.text)
 						self.choice_model_option = self.convert_number(subelement.text)
-					else:
+					if subelement.tag == "model%d"%i:
+						self.model_partitions.append(ModelSelection(self.manual_model_frame, part_id="   Alignment %d" % i))
+						self.model_partitions[-1].grid(sticky=W)
+						self.part_offset+=30
 						for model in subelement:
-							#print "iteration: ", i
 							for key, setting in self.model_partitions[i].model.__dict__.iteritems():
 								if key == model.tag:
 									#print key, model.text
 									self.model_partitions[i].model.__dict__[key] = self.convert_number(model.text)
 							#print "length %d " % len(self.model_partitions)
 						i += 1
-						if i == len(self.model_partitions):
-							break
+				#self.create_models()
 				for i in range(0, len(self.model_partitions)):
 					self.model_partitions[i].load_model()
-				self.model_frame_down.grid(row=3, column=1, sticky=N+S+W+E)
+				self.manual_model_frame.update()
+				#self.manual_model_frame.update()
+				#self.model_frame_down.grid(row=3, column=1, sticky=N+S+W+E)
+				self.manual_model_frame.update()
 				self.auto_model_select.grid_forget()
-			"""
+
 			if child.tag == "bootstrap":
 				for subelement in child:
 					if subelement.tag == "option":
@@ -755,11 +769,23 @@ class iqtree_GUI:
 		print self.config_path
 		try:
 			config.read(self.config_path)
+			if self.gui_settings.version != config.get("Settings", "version"):
+				print "Config file seems to be from a different version of iqtreegui. This may cause problems: %s" % self.config_path
 			self.gui_settings.iqtree_path = config.get('Settings', 'iqtree')
 			self.gui_settings.wd = config.get('Settings', 'wd')
 		except:
 			tkMessageBox.showerror("Error", "Config file error")
 			return
+			
+	def create_new_config_file(self):
+		config = ConfigParser.ConfigParser()
+		configfile = open(self.config_path, 'wb')
+		config.add_section('Settings')
+		config.set('Settings', 'iqtree', self.gui_settings.iqtree_path)
+		config.set('Settings', 'version', self.gui_settings.version)
+		config.set('Settings', 'wd', self.gui_settings.wd)
+		config.write(configfile)
+		configfile.close()
 
 	def __init__(self, top):
 		os.chdir(self.gui_settings.wd) # this is needed for the bundled mac app
@@ -865,9 +891,7 @@ class iqtree_GUI:
 		self.logo_cv = Label(self.info_frame, image=self.img)
 		self.logo_cv.image = self.img
 		self.logo_cv.grid(row=1, column=1, rowspan=5, sticky=W)
-		
-		#welcome_message = "_       __                 ________  ______\n (_)___ _/ /_________  ___  / ____/ / / /  _/\n/ / __ `/ __/ ___/ _ \/ _ \/ / __/ / / // /  \n/ / /_/ / /_/ /  /  __/  __/ /_/ / /_/ // /   \n/_/\__, /\__/_/   \___/\___/\____/\____/___/   \n/_/"
-			         
+					         
 		message = "iqtreeGUI - A graphical user interface for IQ-TREE.\n\nhttp://github.com/reslp/iqtreegui\n\nVersion %s \n\n" % self.gui_settings.version
 		self.label = Label(self.info_frame, text=message)
 		self.label.configure(font="Helvetica 14 bold")
@@ -903,17 +927,10 @@ class iqtree_GUI:
 		
 		# load settings file, create if it does not exist
 		#tkMessageBox.showerror("Error", resource_path('/config.txt'))
-		print self.config_path
+		print "Looking for config file in:", self.config_path
 		if not os.path.isfile(self.config_path): #check if config file exists
-			config = ConfigParser.ConfigParser()
-			configfile = open(self.config_path, 'wb')
-			config.add_section('Settings')
-			config.set('Settings', 'iqtree', self.gui_settings.iqtree_path)
-			config.set('Settings', 'version', self.gui_settings.version)
-			config.set('Settings', 'wd', self.gui_settings.wd)
-			config.write(configfile)
-			configfile.close()
-			print "config file not found"
+			print "config file not found, new config file will be created"
+			self.create_new_config_file()
 			## self.info_label.insert(END, self.get_time()+"No config file found. I created a new one...\n")
 		else:
 			self.read_config_file()
