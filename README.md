@@ -41,6 +41,17 @@ Executables are available for Linux, MacOS and Windows. The Windows and Linux ve
 
 For iqtreeGUI to work you will also need to download and install [IQ-TREE](http://www.iqtree.org). Once you have started iqtreeGUI you will have to set the correct path to the IQ-TREE executable. Click on iqtree-GUI -> GUI settings and select the iqtree executable.
 
+Another possibility is to download the complete source code using git clone:
+
+`git clone https://github.com/reslp/iqtreeGUI`
+
+This will download the complete iqtreeGUI repository, meaning that it will download the most recent version of iqtreeGUI. This version may differ from the provided binaries and may contain additional features and bugs.
+You can then start iqtreeGUI directly from the newly downloaded directory:
+
+`python iqtreegui.py`
+
+
+
 
 Building executables
 ===================
