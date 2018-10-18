@@ -418,7 +418,7 @@ class iqtree_GUI:
 	
 	def add_alignment(self):
 		filename = "no file name"
-		filename = tkFileDialog.askopenfilename(initialdir = "~",title = "Select alignment")
+		filename = tkFileDialog.askopenfilename(initialdir = self.gui_settings.wd,title = "Select alignment")
 		print filename
 		if filename != "" and filename != "no file name":
 			self.alignments.append(Alignment(self.alignment_scroll_frame, align_id="Alignment "+str(len(self.alignments)+1)+":  ", path = filename, number=len(self.alignments)+1))
@@ -609,6 +609,7 @@ class iqtree_GUI:
 						tkMessageBox.showerror("Error", "Specified model for Partition 1 " + self.model_partitions[0].get_model())
 					else:
 						partition_command += "charpartition mine = " + self.model_partitions[0].get_model() +":part1;"
+					partition_command += "\nend;\n"
 			## add model parameters for multiple partition	
 			if self.choice_part_option == 2:
 				
