@@ -14,12 +14,12 @@ iqtreeGUI is a graphical front-end for [IQ-TREE](http://www.iqtree.org). The goa
 
 A work in progress
 ==============
-One of the great things about IQ-TREE is that is has lots of possibilities to combine different parameters and analyses. While iqtreeGUI aims to provide a graphical way to access all these features, unfortunately I don't have the capacity to test every possible combination of parameters IQ-TREE allows. At the moment iqtreeGUI is still under active developement. Therefore there may still be a large number of bugs. I am greatful for every bug report I receive. Reporting bugs will help to improve iqtreeGUI.
+One of the great things about IQ-TREE is that is has lots of possibilities to combine different parameters and analyses. While iqtreeGUI aims to provide a graphical way to access all these features, it is almost impossible to test every possible combination of parameters IQ-TREE allows. At the moment iqtreeGUI is still under active developement. Therefore there may still be a large number of bugs. I am greatful for every bug report I receive. Reporting bugs will help to improve iqtreeGUI.
 
 Features
 ===========
 
-iqtreeGUI aims to implement all features of IQ-TREE v1.6.1 
+iqtreeGUI aims to implement all features of IQ-TREE v1.6. It has been tested with v1.6.1 but it may also run with newer versions of IQ-TREE.
 
 Currently implemented features:
 
@@ -39,7 +39,7 @@ Obtaining and configuring iqtreeGUI
 ================
 Executables are available for Linux, MacOS and Windows. The Windows and Linux versions were built using a combination of Docker and pyinstaller. 
 
-For iqtreeGUI to work you will also need to download and install [IQ-TREE](http://www.iqtree.org). Once you have started iqtreeGUI you will have to set the correct path to the IQ-TREE executable. Click on iqtree-GUI -> GUI settings and select the iqtree executable.
+For iqtreeGUI to work you will also need to download and install [IQ-TREE](http://www.iqtree.org). Once you have started iqtreeGUI you will have to set the correct path to the IQ-TREE executable. Click on iqtreeGUI -> GUI settings and select the iqtree executable.
 
 Another possibility is to download the complete source code using git clone:
 
