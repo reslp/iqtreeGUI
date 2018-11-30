@@ -720,18 +720,23 @@ class iqtree_GUI:
 				
 		### the stuff from here should be the same regardless of the other options
 		## check for partition command and adjust
+		if "Windows" in platform.system():
+			separator="\\"
+		else:
+			separator="/"
+			
 		if partition_command != "":
-			file = open(self.gui_settings.wd+"/partitions.nex", "w")
+			file = open(self.gui_settings.wd+separator+"partitions.nex", "w")
 			file.write(partition_command)
 			file.close()
 			if "(-spp)" in self.partition_model:
-				command += "-spp "+self.gui_settings.wd+"/partitions.nex "
+				command += "-spp "+self.gui_settings.wd+separator+"partitions.nex "
 			elif "(-q)" in self.partition_model:
-				command += "-q "+self.gui_settings.wd+"/partitions.nex "
+				command += "-q "+self.gui_settings.wd+separator+"partitions.nex "
 			elif "(-sp)" in self.partition_model:
-				command += "-sp "+self.gui_settings.wd+"/partitions.nex "
+				command += "-sp "+self.gui_settings.wd+separator+"partitions.nex "
 			else:
-				command += "-spp "+self.gui_settings.wd+"/partitions.nex " #standard	
+				command += "-spp "+self.gui_settings.wd+separator+"partitions.nex " #standard	
 		
 		##get additional settings for automatic model selection:
 		if self.choice_model_option == 1:

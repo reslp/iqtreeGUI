@@ -3,7 +3,7 @@ iqtreeGUI
 
 This repository contains source code and executables for a graphical user interface for [IQ-TREE](http://www.iqtree.org). 
 
-__Note:__ There is a proplem with iqtreeGUI on MacOS Mojave (10.14). Buttons don't appear at all or without labels (although they are there and work). The problem is the underlying Tk framework I am using to create the GUI. I am aware of the problem and a fix is incoming. As a workaround you can resize the affected window slightly and all buttons should re-appear.
+__Note:__ There is a proplem with iqtreeGUI on MacOS Mojave (10.14). Buttons don't appear at all or without labels (although they are there and work). The problem is the underlying Tk framework I am using to create the GUI. I am aware of the problem and a fix is incoming. As a workaround you can resize the affected window slightly and all buttons should re-appear. This bug only seems to appear in the pre-compiled version.
  
 
 Description
