@@ -9,7 +9,7 @@ __Note:__ There is a proplem with iqtreeGUI on MacOS Mojave (10.14). Buttons don
 Description
 ===========
 
-iqtreeGUI is a graphical front-end for [IQ-TREE](http://www.iqtree.org). The goal is to implement all features of IQ-TREE 1.6.1. It is under active development and therefore several features are still missing (eg. a GUI for likelihood mapping, topology tests). iqtreeGUI is written in Python and executables are available for Windows, Linux and MacOS.
+iqtreeGUI is a graphical front-end for [IQ-TREE](http://www.iqtree.org). The goal is to implement all features of IQ-TREE 1.6.*. It is under active development and therefore several features are still missing (eg. a GUI for likelihood mapping, topology tests). iqtreeGUI is written in Python and executables are available for Windows, Linux and MacOS.
 
 ![Screenshot of iqtreeGUI](screenshot.png)
 *Figure: iqtreeGUi running on MacOS High Sierra*
