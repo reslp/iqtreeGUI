@@ -1,8 +1,6 @@
 #!/bin/bash
-# This is the script to build MacOS, Linux and Windows Versions of iqtreeGUI
+# This is the script to the Linux and Windows Versions of iqtreeGUI
 
-#macOS build: requires pyinstaller
-pyinstaller iqtreegui.spec
 
 #Windows build: requires Docker
 docker run -v "$(pwd):/src/" cdrx/pyinstaller-windows:python2

@@ -420,6 +420,8 @@ class iqtree_GUI:
 		filename = "no file name"
 		filename = tkFileDialog.askopenfilename(initialdir = self.gui_settings.wd,title = "Select alignment")
 		print filename
+		if "Windows" in platform.system():
+			filename = filename.replace("/","\\")
 		if filename != "" and filename != "no file name":
 			self.alignments.append(Alignment(self.alignment_scroll_frame, align_id="Alignment "+str(len(self.alignments)+1)+":  ", path = filename, number=len(self.alignments)+1))
 			self.alignments[-1].grid(sticky=W)
@@ -757,7 +759,14 @@ class iqtree_GUI:
 		# self.info_label.insert(END, self.get_time()+"iqtree command will be: "+command+"\n")
 		
 		if self.simulate_only == 0:
-			self.spawn_iqtree_subprocess(command)		
+			self.spawn_iqtree_subprocess(command)	
+		else:
+			#self.command_info_label.config(text="IQ-TREE command will be: \n"+command)	
+			
+			self.command_info_label.grid(row=14, column=0, columnspan=3, sticky=W)
+			self.command_entry.grid(row=15, column=0, sticky=W+E, columnspan=10)
+			self.command_entry.delete(0, END)
+			self.command_entry.insert(END, command)
 					
 	def spawn_iqtree_subprocess(self, command):	
 		iqtree_out_window=Toplevel(self.master)
@@ -803,7 +812,7 @@ class iqtree_GUI:
 		self.master = top
 		top.geometry("1000x593")#+330+201")
 		top.title("iqtreeGUI Alpha")
-		top.resizable(width=False, height=False)
+		top.resizable(width=True, height=True) # set to True to enable the workaround for the disappearing buttons on Mojave
 		top.grid_rowconfigure(0, weight=1)
 		top.grid_columnconfigure(0, weight=1)
 		#top.iconbitmap(resource_path("iqtreegui.ico"))
@@ -819,17 +828,16 @@ class iqtree_GUI:
 		self.notebook = ttk.Notebook(top)
 		self.notebook.bind("<ButtonRelease-1>", self.update_notebook)
 		
-		if root.tk.call('tk', 'windowingsystem') == 'aqua': #change padding of notebook tabs if osx
-			s=ttk.Style()
-			s.configure("TNotebook.Tab", padding=(18, 8, 20, 0))
+		# this was used due to a bug in tk/tcl
+		#if root.tk.call('tk', 'windowingsystem') == 'aqua': #change padding of notebook tabs if osx
+		#	s=ttk.Style()
+		#	s.configure("TNotebook.Tab", padding=(18, 8, 20, 0))
 		
-		#self.notebook.place(relx=0, rely=0, relheight=0.9, relwidth=1)
 		self.notebook.grid(row=0, column=0,columnspan=10, rowspan=1, sticky=N+S+W+E)
 
 		
 		## threads selection
 		self.Label3 = Label(top)
-		#self.Label3.place(relx=0.15, rely=0.94, height=18, width=130)
 		self.Label3.configure(text='''Number of threads:''')
 		self.Label3.grid(row=1, column=4, sticky=W)
 		
@@ -924,7 +932,25 @@ class iqtree_GUI:
 		
 		self.bootstrap_info_label = Label(self.info_frame, text="Bootstrap: no bootstraping")
 		self.bootstrap_info_label.config(justify=LEFT)
-		self.bootstrap_info_label.grid(row=12, column=1, columnspan=3, sticky=W)		
+		self.bootstrap_info_label.grid(row=12, column=1, columnspan=3, sticky=W)	
+		
+		self.info_frame.rowconfigure(13, minsize=140)
+		
+		
+		self.command_info_label = Label(self.info_frame, text="IQ-TREE command will be:")
+		self.command_info_label.configure(font="Helvetica 14 bold")
+		self.command_info_label.config(justify=LEFT)
+		self.command_info_label.grid(row=14, column=0, columnspan=3, sticky=W)
+		self.command_info_label.grid_forget()
+		
+		
+		
+		self.command_entry = Entry(self.info_frame)
+		self.command_entry.grid(row=15, column=0, sticky=W+E, columnspan=10)
+		self.command_entry.insert(END, "no command yet")
+		self.command_entry.grid_forget()
+		
+		
 		
 		
 		
@@ -969,6 +995,7 @@ class iqtree_GUI:
 		self.alignment_scroll_frame = ScrollableFrame(self.alignment_frame_container)
 		
 		self.notebook.add(self.alignment_frame, text="Alignment")
+		self.notebook.update_idletasks()
 			
 
 ###Partitioning########			
@@ -1213,4 +1240,5 @@ if __name__ == '__main__':
 	root = Tk()
 	top = iqtree_GUI(root)
 	root.mainloop()
+	
 	#vp_start_gui()
