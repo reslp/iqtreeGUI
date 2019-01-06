@@ -1,12 +1,10 @@
 #!/bin/bash
-# This is the script to the Linux and Windows Versions of iqtreeGUI
+# This script builds the Linux and Windows Versions of iqtreeGUI using Docker
 
 
 #Windows build: requires Docker
-docker run -v "$(pwd):/src/" cdrx/pyinstaller-windows:python2
+docker run -v "$(pwd):/src/" cdrx/pyinstaller-windows:python3
 
 #Linux Build: requires Docker with custom command
-docker run -v "$(pwd):/src/" cdrx/pyinstaller-linux:python2 "apt-get update -y && apt-get install -y python-tk && pyinstaller --clean -y --dist ./dist/linux --workpath /tmp *.spec"
+docker run -v "$(pwd):/src/" cdrx/pyinstaller-linux:python3 "apt-get update -y && apt-get install -y python3-tk && pyinstaller --clean -y --dist ./dist/linux --workpath /tmp *.spec"
 
-#clean up environment
-rm *.pyc
