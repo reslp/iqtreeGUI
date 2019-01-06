@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 #written by Philipp Resl
+#this is the python3 version of iqtreegui
 
 import sys, os
 import subprocess
@@ -7,33 +8,20 @@ import multiprocessing
 import tempfile
 from subprocess import Popen, PIPE
 import datetime
-import ConfigParser
+import configparser
 import xml.etree.ElementTree as ET
 from xml.dom import minidom as MD
 import unicodedata
-from Tkinter import *
-import tkFileDialog, tkMessageBox
-from ScrolledText import ScrolledText
-import ttk
+from tkinter import *
+import tkinter.filedialog, tkinter.messagebox
+from tkinter.scrolledtext import ScrolledText
+import tkinter.ttk
 import platform
-
-
 from os.path import expanduser
-"""
-try:
-	from Tkinter import *
-	import tkFileDialog, tkMessageBox
-	from ScrolledText import ScrolledText
-except ImportError:
-	from tkinter import *
+from shutil import copy, rmtree
 
-try:
-	import ttk
-	py3 = 0
-except ImportError:
-	import tkinter.ttk as ttk
-	py3 = 1
-"""
+
+# import iqtreegui modules
 import iqtree_gui_support
 from model_select import *
 from partition import *
@@ -49,45 +37,15 @@ from consensustree import *
 from robinsonfoulds import *
 from randomtree import *
 from alignment import *
-"""
-def vp_start_gui():
-	# Starting point when module is the main routine.
-	global val, w, root
-	root = Tk()
-	iqtree_gui_support.set_Tk_var()
-	top = itree_GUI (root)
-	iqtree_gui_support.init(root, top)
-	root.mainloop()
 
-w = None
-def create_itree_GUI(root, *args, **kwargs):
-	# Starting point when module is imported by another program.
-	global w, w_win, rt
-	rt = root
-	w = Toplevel (root)
-	iqtree_gui_support.set_Tk_var()
-	top = itree_GUI (w)
-	iqtree_gui_support.init(w, top, *args, **kwargs)
-	return (w, top)
-
-def destroy_itree_GUI():
-	global w
-	w.destroy()
-	w = None
-"""	
-def resource_path(relative):
+def resource_path(relative): #needed to load iqtreeGUI icon
 	if hasattr(sys, '_MEIPASS'):
 		return sys._MEIPASS + relative
 	return sys.path[0] + relative
 	#return os.path.join(os.environ.get("_MEIPASS2",os.path.abspath(".")),relative)
-
-
-		
-		
-###### start of main class #######
+	
+###### main class #######
 class iqtree_GUI:
-	filename = "/Users/sinnafoch/Dropbox/Philipp/iqtreegui/test_cases/alignment_small.fas"
-	#iqtree_path = "/usr/bin/iqtree"
 	nthreads = "AUTO"
 	nbootstrap = 1000
 	overwrite=1
@@ -130,13 +88,13 @@ class iqtree_GUI:
 		
 
 	def about_message(self):
-		tkMessageBox.showinfo("About", "iqtreeGUI Version "+self.gui_settings.version+"\nwritten by Philipp Resl")
+		tkinter.messagebox.showinfo("About", "iqtreeGUI Version "+self.gui_settings.version+"\nwritten by Philipp Resl")
 	
 	def not_yet(self):
-		tkMessageBox.showinfo("Info", "This feature is not yet implemented in IQ-tree GUI.")
+		tkinter.messagebox.showinfo("Info", "This feature is not yet implemented in IQ-tree GUI.")
 		
 	def save_analysis(self):
-		f = tkFileDialog.asksaveasfile(mode='w', defaultextension=".xml")
+		f = tkinter.filedialog.asksaveasfile(mode='w', defaultextension=".xml")
 		if f is None: # asksaveasfile return `None` if dialog closed with "cancel".
 			return
 		top = ET.Element('top')
@@ -146,7 +104,7 @@ class iqtree_GUI:
 		
 		#write bootstrap settings
 		child = ET.SubElement(top, "advancedbootstrap")
-		for key, value in self.advanced_bs_settings.__dict__.iteritems():
+		for key, value in self.advanced_bs_settings.__dict__.items():
 			elem = ET.SubElement(child, key)
 			elem.text = str(value)
 		elem = ET.SubElement(child, "nbootstrap")
@@ -156,13 +114,13 @@ class iqtree_GUI:
 		
 		#write tree search settings
 		child = ET.SubElement(top, "treesearch")
-		for key, value in self.treesearch_settings.__dict__.iteritems():
+		for key, value in self.treesearch_settings.__dict__.items():
 			elem = ET.SubElement(child, key)
 			elem.text = str(value)
 		
 		#write iqtree settings
 		child = ET.SubElement(top, "iqtreesettings")
-		for key, value in self.iqtree_settings.__dict__.iteritems():
+		for key, value in self.iqtree_settings.__dict__.items():
 			elem = ET.SubElement(child, key)
 			elem.text = str(value)
 		elem = ET.SubElement(child, "redo")
@@ -170,7 +128,7 @@ class iqtree_GUI:
 			
 		#write advanced model settings
 		child = ET.SubElement(top, "advancedmodelsettings")
-		for key, value in self.advanced_model_settings.__dict__.iteritems():
+		for key, value in self.advanced_model_settings.__dict__.items():
 			elem = ET.SubElement(child, key)
 			elem.text = str(value)
 			
@@ -213,10 +171,10 @@ class iqtree_GUI:
 			for i in range(0, len(self.model_partitions)):
 				name = "model%d" % i
 				child = ET.SubElement(model_child, name)
-				print self.model_partitions[i].model.__dict__
-				for key, value in self.model_partitions[i].model.__dict__.iteritems():
+				print(self.model_partitions[i].model.__dict__)
+				for key, value in self.model_partitions[i].model.__dict__.items():
 					elem = ET.SubElement(child, key)
-					print value
+					print(value)
 					elem.text = value
 		else:
 			child = ET.SubElement(model_child, "model0")
@@ -238,43 +196,43 @@ class iqtree_GUI:
 		f.close()
 		
 	def load_analysis(self):
-		print "loading analysis..."
+		print("loading analysis...")
 		self.reset_partitions() # delete old partitions
-		filename = tkFileDialog.askopenfilename()
+		filename = tkinter.filedialog.askopenfilename()
 		if filename is "": # return `None` if dialog closed with "cancel".
 			return
 		try:
 			tree = ET.parse(filename) 
 		except:
-			tkMessageBox.showinfo("Error", "Not a valid iqtreeGUI XML file")
+			tkinter.messagebox.showinfo("Error", "Not a valid iqtreeGUI XML file")
 			return 
 		root = tree.getroot()
 		
 		for child in root:
 			if child.tag == "advancedbootstrap":
 				for subelement in child:
-					for key, setting in self.advanced_bs_settings.__dict__.iteritems():
+					for key, setting in self.advanced_bs_settings.__dict__.items():
 						if key == subelement.tag:
 							self.advanced_bs_settings.__dict__[key] = self.convert_number(subelement.text)
 			if child.tag == "treesearch":
 				for subelement in child:
-					for key, setting in self.treesearch_settings.__dict__.iteritems():
+					for key, setting in self.treesearch_settings.__dict__.items():
 						if key == subelement.tag:
 							self.treesearch_settings.__dict__[key] = self.convert_number(subelement.text)
 			if child.tag == "iqtreesettings":
 				for subelement in child:
-					for key, setting in self.iqtree_settings.__dict__.iteritems():
+					for key, setting in self.iqtree_settings.__dict__.items():
 						if key == subelement.tag:
 							self.iqtree_settings.__dict__[key] = self.convert_number(subelement.text)
 			if child.tag == "advancedmodelsettings":
 				for subelement in child:
-					for key, setting in self.advanced_model_settings.__dict__.iteritems():
+					for key, setting in self.advanced_model_settings.__dict__.items():
 						if key == subelement.tag:
 							#print key
 							#print subelement.text
 							self.advanced_model_settings.__dict__[key] = self.convert_number(subelement.text)
 			if child.tag == "alignments": #adjust this for multiple alignment files
-				print "loading alignments"
+				print("loading alignments")
 				# first remove old alignments
 				for i in range(0,len(self.alignments)):
 					self.alignments[i].grid_forget()
@@ -331,7 +289,7 @@ class iqtree_GUI:
 						self.model_partitions[-1].grid(sticky=W)
 						self.part_offset+=30
 						for model in subelement:
-							for key, setting in self.model_partitions[i].model.__dict__.iteritems():
+							for key, setting in self.model_partitions[i].model.__dict__.items():
 								if key == model.tag:
 									#print key, model.text
 									self.model_partitions[i].model.__dict__[key] = self.convert_number(model.text)
@@ -383,7 +341,7 @@ class iqtree_GUI:
 		
 	
 	def spawn_settings_window(self):
-		print "settings"
+		print("settings")
 		settings_window=Toplevel(self.master)
 		settings = SettingsWindow(settings_window, self.gui_settings, self.config_path)
 		self.master.wait_window(settings_window)
@@ -392,7 +350,7 @@ class iqtree_GUI:
 		# self.info_label.insert(END, self.get_time()+"Path to iqtree is: "+self.gui_settings.iqtree_path+"\n")
 	
 	def spawn_advanced_bootstrap_window(self):
-		print "advanced bootstrap settings"
+		print("advanced bootstrap settings")
 		settings_window=Toplevel()
 		settings = AdvancedBSWindow(settings_window, self.advanced_bs_settings)
 		self.master.wait_window(settings_window)
@@ -418,8 +376,8 @@ class iqtree_GUI:
 	
 	def add_alignment(self):
 		filename = "no file name"
-		filename = tkFileDialog.askopenfilename(initialdir = self.gui_settings.wd,title = "Select alignment")
-		print filename
+		filename = tkinter.filedialog.askopenfilename(initialdir = self.gui_settings.wd,title = "Select alignment")
+		print(filename)
 		if "Windows" in platform.system():
 			filename = filename.replace("/","\\")
 		if filename != "" and filename != "no file name":
@@ -429,41 +387,19 @@ class iqtree_GUI:
 			self.alignment_scroll_frame.update()
 			self.alignment_info_label.config(text="Alignments: %s Alignment(s) loaded" % str(len(self.alignments)))
 		
-	"""	
-	def open_partition(self):
-		self.filename_partition = tkFileDialog.askopenfilename(initialdir = "~",title = "Select alignment")
-		print self.filename_partition
-		f = open(self.filename_partition,"r")
-		partition = ""
-		for line in f.readlines():
-			partition += line
-		self.partition_view.delete("1.0",END)
-		self.partition_view.insert(END, partition)
-		f.close()
-		self.model_partitions = []
-		self.is_models_set=False # will maybe also reset partitions if cancel is clicked!
-	"""
 		
 	def create_partition(self):
 		alignment_names = [element.alignment_id.strip(": ") for element in self.alignments]
 		if len(alignment_names) == 0: # in case there is no alignment loaded, return. probably this needs a message box
-			print "no alignments loaded"
-			tkMessageBox.showerror("Error", "First specify at least one alignment.")
+			print("no alignments loaded")
+			tkinter.messagebox.showerror("Error", "First specify at least one alignment.")
 			return
-		print alignment_names
+		print(alignment_names)
 		self.align_partitions.append(Partition(self.partitions_set_frame, part_id="Partition "+str(len(self.align_partitions)+1)+"  ", alignments = alignment_names, number = len(self.align_partitions)+1))
 		self.align_partitions[-1].grid()
 		self.partitions_set_frame.update()
 		self.partition_info_label.config(text="Partitions: %s Partitions specified" % str(len(self.align_partitions)))
-		"""
-		if len(self.align_partitions) > len(self.model_partitions):
-			self.model_partitions.append(ModelSelection(self.manual_model_frame, part_id="   Partition "+str(len(self.model_partitions)+1)))
-			self.model_partitions[-1].grid(sticky=W)
-			self.part_offset+=30
-		self.manual_model_frame.update()
-		self.model_frame_down.grid_forget()
-		"""
-		print "Partition created"
+		print("Partition created")
 	
 	def reset_partitions(self):
 		for i in range(0, len(self.align_partitions)): # partitions
@@ -471,55 +407,40 @@ class iqtree_GUI:
 		self.align_partitions[:] = []
 		self.partitions_set_frame.update()
 		self.partition_info_label.config(text="Partitions: unpartitioned")
-		"""
-		for i in range(0, len(self.model_partitions)): # models
-			self.model_partitions[i].grid_forget()
-		self.part_offset=0
-		self.model_partitions[:] = []
-		self.model_partitions.append(ModelSelection(self.manual_model_frame, part_id="   Partition 1"))
-		self.model_partitions[-1].grid(sticky=W)
-		self.part_offset+=30
-		self.manual_model_frame.update()
-		"""
+
 		
 	def delete_partition(self):
 		if len(self.align_partitions) > 0:
 			self.align_partitions[-1].grid_forget()
 			self.align_partitions = self.align_partitions[:-1]
-		"""if len(self.model_partitions) > 1:
-			self.model_partitions[-1].grid_forget()
-			self.model_partitions = self.model_partitions[:-1]
-			self.part_offset-=30
-		self.manual_model_frame.update()
-		"""
 		self.partition_info_label.config(text="Partitions: %s Partitions specified" % str(len(self.align_partitions)))
 		self.partitions_set_frame.update()
 		# self.info_label.insert(END, self.get_time()+"Partition deleted\n")
 		
 	def create_models(self): # function will create model instances according to the specified alignment and partition options
 		if len(self.alignments) == 1:
-			print "create_model: single alignment"
+			print("create_model: single alignment")
 			if self.choice_part_option == 1: #no partitioning
-				print "create_model: no partition"
+				print("create_model: no partition")
 				self.model_partitions.append(ModelSelection(self.manual_model_frame, part_id="   Alignment 1"))
 				self.model_partitions[-1].grid(sticky=W)
 				self.part_offset+=30
 				self.manual_model_frame.update()
 			elif self.choice_part_option == 2: #partitions
 				if len(self.align_partitions) == 0:
-					tkMessageBox.showerror("Error", "Specify at least one partition per alignment first.")
+					tkinter.messagebox.showerror("Error", "Specify at least one partition per alignment first.")
 					return
 				else:
-					print "create_model: multiple partitions"
+					print("create_model: multiple partitions")
 					for i in range(0, len(self.align_partitions)):
 						self.model_partitions.append(ModelSelection(self.manual_model_frame, part_id="   Partition %s" % str(i+1)))
 						self.model_partitions[-1].grid(sticky=W)
 						self.part_offset+=30
 						self.manual_model_frame.update()			
 		elif len(self.alignments) > 1: #multiple alignments
-			print "create_model: multiple alignments"
+			print("create_model: multiple alignments")
 			if self.choice_part_option == 1: #no partitioning
-				print "create_model: no partitions"
+				print("create_model: no partitions")
 				for i in range(0, len(self.alignments)):
 					self.model_partitions.append(ModelSelection(self.manual_model_frame, part_id="   Alignment %s" % str(i+1)))
 					self.model_partitions[-1].grid(sticky=W)
@@ -527,10 +448,10 @@ class iqtree_GUI:
 					self.manual_model_frame.update()
 			elif self.choice_part_option == 2: #partitions
 				if len(self.align_partitions) == 0 or (len(self.align_partitions) < len(self.alignments)):
-					tkMessageBox.showerror("Error", "Specify at least one partition per alignment first.")
+					tkinter.messagebox.showerror("Error", "Specify at least one partition per alignment first.")
 					return
 				else:
-					print "create_model: multiple partitions"
+					print("create_model: multiple partitions")
 					for i in range(0, len(self.align_partitions)):
 						self.model_partitions.append(ModelSelection(self.manual_model_frame, part_id="   Partition %s" % str(i+1)))
 						self.model_partitions[-1].grid(sticky=W)
@@ -539,21 +460,19 @@ class iqtree_GUI:
 		self.model_info_label.config(text="Models: %s Models specified" % str(len(self.model_partitions)))
 						
 	def reset_models(self):
-		print "reset_models: Removing " +str(len(self.model_partitions))+" partitions"
+		print("reset_models: Removing " +str(len(self.model_partitions))+" partitions")
 		for i in range(0, len(self.model_partitions)):
 			self.model_partitions[i].grid_forget()
 		self.model_partitions[:] = []
 		self.part_offset=0
 		self.manual_model_frame.update()
-					
-			
-		
+							
 	def get_partitions(self):
 		return len(self.align_partitions)
 		
 	def get_additional_settings_for_run(self):
 		add_cmd = ""
-		print self.advanced_model_settings.get_command()
+		print(self.advanced_model_settings.get_command())
 		add_cmd += self.iqtree_settings.get_command()
 		add_cmd += self.advanced_bs_settings.get_command()
 		add_cmd += self.treesearch_settings.get_command()
@@ -566,10 +485,31 @@ class iqtree_GUI:
 	#																					 #
 	######################################################################################
 	def get_run_command_new(self):
-		print "creating run command"
-		print "Alignments: %d " % len(self.alignments)
-		print "Partitions: %d " % len(self.align_partitions)
-		print "Models: %d" % len(self.model_partitions)
+		print("creating run command")
+		print("Alignments: %d " % len(self.alignments))
+		print("Partitions: %d " % len(self.align_partitions))
+		print("Models: %d" % len(self.model_partitions))
+
+		if "Windows" in platform.system():
+			separator="\\"
+		else:
+			separator="/"
+
+		## create output directory and transfer alignment files
+		analysis_dir = self.gui_settings.wd + separator + self.gui_settings.analysisname
+		#print(analysis_dir)
+		
+		if self.overwrite == 1 and os.path.exists(analysis_dir) == True:
+			rmtree(analysis_dir, ignore_errors=True)
+			os.makedirs(analysis_dir)
+		elif self.overwrite == 1 and os.path.exists(analysis_dir) == False:
+			os.makedirs(analysis_dir)
+		elif self.overwrite == 0 and os.path.exists(analysis_dir) == False:
+			os.makedirs(analysis_dir)
+		else:
+			tkinter.messagebox.showerror("Error", "Analysis folder already exists.")
+			return
+
 		## create initial run command
 		command = self.gui_settings.iqtree_path +" "
 		## add number of threads
@@ -582,7 +522,7 @@ class iqtree_GUI:
 				int(self.entry_bs.get())
 				command += "-b %s " % self.entry_bs.get()
 			except:
-				tkMessageBox.showerror("Error", "Not a valid number of bootstrap replicates.")
+				tkinter.messagebox.showerror("Error", "Not a valid number of bootstrap replicates.")
 				return
 				
 		if self.choice_bs_option == 3:
@@ -590,25 +530,27 @@ class iqtree_GUI:
 				int(self.entry_bs.get())
 				command += "-bb %s " % self.entry_bs.get()
 			except:
-				tkMessageBox.showerror("Error", "Not a valid number of bootstrap replicates.")
+				tkinter.messagebox.showerror("Error", "Not a valid number of bootstrap replicates.")
 				return
 		
 		if len(self.alignments) == 0:
-			print "no alignment"
+			print("no alignment")
 			return 
 		### if there is only a single alignment:
 		elif len(self.alignments) == 1:
-			print "single alignment"
+			print("single alignment")
+			#copy file to analysis directory
+			copy(self.alignments[0].alignment_path, analysis_dir)
 			## add model parameters for single partition:
 			if self.choice_part_option == 1:	
 				partition_command="#NEXUS\nbegin sets;\n"
-				partition_command += "charset part1="+self.alignments[0].alignment_path+":*;\n"
+				partition_command += "charset part1="+os.path.basename(self.alignments[0].alignment_path)+":*;\n"
 				# check for different model options
 				if self.choice_model_option == 1: # if automatic model selection is specified
 					partition_command += "end;\n"
 				if self.choice_model_option == 2:
 					if "invalid" in self.model_partitions[0].get_model():
-						tkMessageBox.showerror("Error", "Specified model for Partition 1 " + self.model_partitions[0].get_model())
+						tkinter.messagebox.showerror("Error", "Specified model for Partition 1 " + self.model_partitions[0].get_model())
 					else:
 						partition_command += "charpartition mine = " + self.model_partitions[0].get_model() +":part1;"
 					partition_command += "\nend;\n"
@@ -624,7 +566,7 @@ class iqtree_GUI:
 				## add parameters for multiple partition:
 				## if there are multiple partitions and models			
 				if self.choice_model_option == 2:
-					print "single alignment, multiple partitions and models"
+					print("single alignment, multiple partitions and models")
 					partition_command="#NEXUS\nbegin sets;\n"
 					## first get partition boundaries:
 					partition_command += "charset part1="+self.alignments[0].alignment_path+":"
@@ -633,12 +575,12 @@ class iqtree_GUI:
 					partition_command += ";\n"
 					## second add models:
 					model_string = "charpartition mine = "
-					print "found partitions: %s" % len(self.model_partitions)
-					for i in xrange(0, len(self.model_partitions)):
+					print("found partitions: %s" % len(self.model_partitions))
+					for i in range(0, len(self.model_partitions)):
 						model = self.model_partitions[i].get_model()
-						print model
+						print(model)
 						if "invalid" in model:
-							tkMessageBox.showerror("Error", "Specified model for Partition " + str(i+1))
+							tkinter.messagebox.showerror("Error", "Specified model for Partition " + str(i+1))
 							break
 						else:
 							model_string += model
@@ -647,7 +589,7 @@ class iqtree_GUI:
 					model_string = model_string[:-1]
 					model_string += ";\nend;\n"
 					partition_command += model_string
-					print partition_command
+					print(partition_command)
 				if self.choice_model_option == 1 and len(self.align_partitions)>1: #if there is automatic model selection
 					partition_command="#NEXUS\nbegin sets;\n"
 					partition_command += "charset part1="+self.alignments[0].alignment_path+":"
@@ -658,59 +600,62 @@ class iqtree_GUI:
 
 		### if there are multiple alignments
 		elif len(self.alignments) > 1:
-			print "multiple alignments"
+			print("multiple alignments")
 
 			
 			#### Baustelle hier!!
 			### multiple alignments, no partitions, modeltest = models per alignment
 			if len(self.align_partitions) == 0 and self.choice_model_option == 1:
-				print "multiple alignments, no partitions, modeltest"
+				print("multiple alignments, no partitions, modeltest")
 				#command += self.advanced_model_settings.get_command() #first add model testing option to run command
 				partition_command="#NEXUS\nbegin sets;\n"
 				i = 1
 				for alignment in self.alignments:
-					partition_command += "charset part" + str(i) + "= "+alignment.alignment_path + ":*;\n"
+					copy(alignment.alignment_path, analysis_dir)
+					partition_command += "charset part" + str(i) + "= "+os.path.basename(alignment.alignment_path) + ":*;\n"
 					i += 1
 				partition_command +="end;\n"
 			
 			### multiple alignments, multiple partitions, modeltest = models per alignment (modeltest)
 			elif len(self.align_partitions) >= 1 and self.choice_model_option == 1:
-				print "muliple alignments, multiple partitions, modeltest"
+				print("muliple alignments, multiple partitions, modeltest")
 				#command += self.advanced_model_settings.get_command() #first add model testing option to run command
 				partition_command="#NEXUS\nbegin sets;\n"
 				i = 1
 				for partition in self.align_partitions:
 					alignment = self.alignments[partition.get_which_alignment()-1]
-					partition_command += "charset part" + str(i) + "="+alignment.alignment_path + ":" + " " + str(partition.get_start()) +"-" +str(partition.get_end()) +";\n"
+					copy(alignment.alignment_path, analysis_dir)
+					partition_command += "charset part" + str(i) + "="+os.path.basename(alignment.alignment_path) + ":" + " " + str(partition.get_start()) +"-" +str(partition.get_end()) +";\n"
 					i += 1
 				for alignment in self.alignments:
 					if alignment.alignment_path not in partition_command:
-						partition_command += "charset part" + str(i) + "="+alignment.alignment_path + ":" + " *;\n"
+						partition_command += "charset part" + str(i) + "="+os.path.basename(alignment.alignment_path) + ":" + " *;\n"
 						i +=1 
 				partition_command +="end;\n"	
 				
 			### multiple alignments, multiple partitions, models per partition
 			elif len(self.align_partitions) >= 1 and self.choice_model_option == 2:
-				print "muliple alignments, multiple partitions, models per partition"
+				print("muliple alignments, multiple partitions, models per partition")
 				#command += self.advanced_model_settings.get_command() #first add model testing option to run command
 				partition_command="#NEXUS\nbegin sets;\n"
 				i = 1
 				for partition in self.align_partitions:
 					alignment = self.alignments[partition.get_which_alignment()-1]
-					partition_command += "charset part" + str(i) + "="+alignment.alignment_path + ":" + " " + str(partition.get_start()) +"-" +str(partition.get_end()) +";\n"
+					copy(alignment.alignment_path, analysis_dir)
+					partition_command += "charset part" + str(i) + "="+os.path.basename(alignment.alignment_path) + ":" + " " + str(partition.get_start()) +"-" +str(partition.get_end()) +";\n"
 					i += 1
 				for alignment in self.alignments:
 					if alignment.alignment_path not in partition_command:
-						partition_command += "charset part" + str(i) + "="+alignment.alignment_path + ":" + " *;\n"
+						partition_command += "charset part" + str(i) + "="+os.path.basename(alignment.alignment_path) + ":" + " *;\n"
 						i +=1 
 				## second add models:
 				model_string = "charpartition mine = "
-				print "found partitions: %s" % len(self.model_partitions)
-				for i in xrange(0, len(self.model_partitions)):
+				print("found partitions: %s" % len(self.model_partitions))
+				for i in range(0, len(self.model_partitions)):
 					model = self.model_partitions[i].get_model()
-					print model
+					print(model)
 					if "invalid" in model:
-						tkMessageBox.showerror("Error", "Check model for Partition " + str(i+1))
+						tkinter.messagebox.showerror("Error", "Check model for Partition " + str(i+1))
 						break
 					else:
 						model_string += model
@@ -722,23 +667,19 @@ class iqtree_GUI:
 				
 		### the stuff from here should be the same regardless of the other options
 		## check for partition command and adjust
-		if "Windows" in platform.system():
-			separator="\\"
-		else:
-			separator="/"
 			
 		if partition_command != "":
-			file = open(self.gui_settings.wd+separator+"partitions.nex", "w")
+			file = open(analysis_dir+separator+"partitions.nex", "w")
 			file.write(partition_command)
 			file.close()
 			if "(-spp)" in self.partition_model:
-				command += "-spp "+self.gui_settings.wd+separator+"partitions.nex "
+				command += "-spp "+analysis_dir+separator+"partitions.nex "
 			elif "(-q)" in self.partition_model:
-				command += "-q "+self.gui_settings.wd+separator+"partitions.nex "
+				command += "-q "+analysis_dir+separator+"partitions.nex "
 			elif "(-sp)" in self.partition_model:
-				command += "-sp "+self.gui_settings.wd+separator+"partitions.nex "
+				command += "-sp "+analysis_dir+separator+"partitions.nex "
 			else:
-				command += "-spp "+self.gui_settings.wd+separator+"partitions.nex " #standard	
+				command += "-spp "+analysis_dir+separator+"partitions.nex " #standard	
 		
 		##get additional settings for automatic model selection:
 		if self.choice_model_option == 1:
@@ -754,15 +695,14 @@ class iqtree_GUI:
 		self.partition_command = partition_command
 		
 		## make sure the command looks good
-		print partition_command
-		print command
+		print(partition_command)
+		print(command)
 		# self.info_label.insert(END, self.get_time()+"iqtree command will be: "+command+"\n")
 		
 		if self.simulate_only == 0:
 			self.spawn_iqtree_subprocess(command)	
 		else:
-			#self.command_info_label.config(text="IQ-TREE command will be: \n"+command)	
-			
+			#self.command_info_label.config(text="IQ-TREE command will be: \n"+command)		
 			self.command_info_label.grid(row=14, column=0, columnspan=3, sticky=W)
 			self.command_entry.grid(row=15, column=0, sticky=W+E, columnspan=10)
 			self.command_entry.delete(0, END)
@@ -779,26 +719,30 @@ class iqtree_GUI:
 		self.manual_model_frame.update()	
 		
 	def read_config_file(self):
-		config = ConfigParser.ConfigParser()
-		print "reading config file"
-		print self.config_path
+		config = configparser.ConfigParser()
+		print("reading config file")
+		print(self.config_path)
 		try:
 			config.read(self.config_path)
 			if self.gui_settings.version != config.get("Settings", "version"):
-				print "Config file seems to be from a different version of iqtreegui. This may cause problems: %s" % self.config_path
+				print("Config file seems to be from a different version of iqtreegui. This may cause problems: %s" % self.config_path)
 			self.gui_settings.iqtree_path = config.get('Settings', 'iqtree')
 			self.gui_settings.wd = config.get('Settings', 'wd')
+			self.gui_settings.analysisname = config.get('Settings', 'analysisname')
+			print("Config file read")
 		except:
-			tkMessageBox.showerror("Error", "Config file error")
+			tkinter.messagebox.showerror("Error", "Config file error")
 			return
 			
 	def create_new_config_file(self):
-		config = ConfigParser.ConfigParser()
-		configfile = open(self.config_path, 'wb')
+		config = configparser.ConfigParser()
+		print("Writing config file to", self.config_path)
+		configfile = open(self.config_path, "w")
 		config.add_section('Settings')
 		config.set('Settings', 'iqtree', self.gui_settings.iqtree_path)
 		config.set('Settings', 'version', self.gui_settings.version)
 		config.set('Settings', 'wd', self.gui_settings.wd)
+		config.set('Settings', 'analysisname', self.gui_settings.analysisname)
 		config.write(configfile)
 		configfile.close()
 
@@ -820,12 +764,12 @@ class iqtree_GUI:
 		if "Linux" in platform.system() or "Darwin" in platform.system():
 			self.config_path=os.path.expanduser("~/.iqtree_config")
 		if "Windows" in platform.system():
-			self.config_path="iqtree_config.cfg"
+			self.config_path=os.path.expanduser("~\iqtree_config.cfg")
 		
 		
 
 #### BASIC NOTEBOOK #######
-		self.notebook = ttk.Notebook(top)
+		self.notebook = tkinter.ttk.Notebook(top)
 		self.notebook.bind("<ButtonRelease-1>", self.update_notebook)
 		
 		# this was used due to a bug in tk/tcl
@@ -838,7 +782,7 @@ class iqtree_GUI:
 		
 		## threads selection
 		self.Label3 = Label(top)
-		self.Label3.configure(text='''Number of threads:''')
+		self.Label3.configure(text="Number of threads:")
 		self.Label3.grid(row=1, column=4, sticky=W)
 		
 		threads = [str(i) for i in range(1, multiprocessing.cpu_count()+1)]
@@ -849,7 +793,7 @@ class iqtree_GUI:
 		def cbOption_threads(which):
 			self.nthreads = which
 			# self.info_label.insert(END, self.get_time()+"Number of threads is set to "+self.nthreads+"\n")
-			print "Number of threads set to %s" % self.nthreads
+			print("Number of threads set to %s" % self.nthreads)
 		
 		self.threads_select = OptionMenu(top, var_thread,  *threads, command=cbOption_threads)
 		#self.threads_select.place(relx=0.31, rely=0.93, height=26, width=65)
@@ -868,7 +812,7 @@ class iqtree_GUI:
 			#print self.overwrite
 			# self.info_label.insert(END, self.get_time()+"Overwrite analysis is set to "+str(self.overwrite)+"\n")
 			
-		self.overwrite_analysis = Checkbutton(top, text="Overwrite analysis (-redo)",variable=cb_overwritevar,command=cb_overwrite)
+		self.overwrite_analysis = Checkbutton(top, text="Overwrite analysis",variable=cb_overwritevar,command=cb_overwrite)
 		self.overwrite_analysis.grid(row=1, column=1, sticky=W)
 		
 		cb_simulate_only_var = IntVar()
@@ -892,7 +836,7 @@ class iqtree_GUI:
 		#print os.path.exists(os.path.join(sys.path[0],"iqtreegui.py"))
 		#print os.path.dirname(os.path.realpath(__file__))
 		#print sys.path[0]
-		print resource_path("/icon/iqtreegui.gif")
+		print(resource_path("/icon/iqtreegui.gif"))
 		self.img=PhotoImage(file=resource_path("/icon/iqtreegui.gif"))
 		#print self.img
 		self.info_frame.columnconfigure(0, minsize=250)
@@ -959,9 +903,9 @@ class iqtree_GUI:
 		
 		# load settings file, create if it does not exist
 		#tkMessageBox.showerror("Error", resource_path('/config.txt'))
-		print "Looking for config file in:", self.config_path
+		print("Looking for config file in:", self.config_path)
 		if not os.path.isfile(self.config_path): #check if config file exists
-			print "config file not found, new config file will be created"
+			print("config file not found, new config file will be created")
 			self.create_new_config_file()
 			## self.info_label.insert(END, self.get_time()+"No config file found. I created a new one...\n")
 		else:
@@ -1055,7 +999,7 @@ class iqtree_GUI:
 				self.button_create_part.lift(self.partition_layer)
 				self.button_delete_part.lift(self.partition_layer)
 				self.which_partition_model.lift(self.partition_layer)
-			print(self.part_var.get())
+			print((self.part_var.get()))
 		
 		for option, val in partition_options:
 			Radiobutton(self.small_part_subframe, 
@@ -1075,8 +1019,8 @@ class iqtree_GUI:
 		def cbOption(which):
 			self.partition_model = which
 			# self.info_label.insert(END, self.get_time()+"Partitioning branch model changed to: "+self.partition_model+"\n")
-			print which
-			print self.partition_model
+			print(which)
+			print(self.partition_model)
 			
 		self.which_partition_model = OptionMenu(self.partition_option_frame, self.part_model_var,  *partition_models, command=cbOption)
 		self.which_partition_model.grid(row=3,column=4, sticky=N)
@@ -1105,7 +1049,7 @@ class iqtree_GUI:
 		self.model_frame_top.grid(row=1, column=1, columnspan=20, sticky=N+S+W+E)
 		model_options = [("automatic model selection",1), ("manual model specification",2)]
 	   
-	   	self.v_model_option=IntVar()
+		self.v_model_option=IntVar()
 		self.v_model_option.set(1)
 	   
 		def ShowChoice_model_option(): 
@@ -1119,11 +1063,11 @@ class iqtree_GUI:
 				self.auto_model_select.grid_forget()
 				self.create_models()
 			else:
-				print "else"
-			print "Model changed:"
+				print("else")
+			print("Model changed:")
 			self.choice_model_option=self.v_model_option.get()
 			# self.info_label.insert(END, self.get_time()+"Model settings changed to: "+model_options[self.choice_model_option-1][0]+"\n")
-			print(self.v_model_option.get())
+			print((self.v_model_option.get()))
 		
 		self.small_model_subframe = Frame(self.model_frame_top)
 		self.small_model_subframe.grid(row=2, column=1)
@@ -1174,14 +1118,14 @@ class iqtree_GUI:
 		self.description_bs.grid(row=1,column=1, sticky=W)
 		bootstrap_options = [("no bootstrapping",1), ("nonparametric bootstrap (-b)",2), ("ultrafast approximation (-bb)",3)]
 	   
-	   	self.v=IntVar()
+		self.v=IntVar()
 		self.v.set(1)
 	   
 		def ShowChoice():
 			self.choice_bs_option=self.v.get()
 			self.bootstrap_info_label.config(text="Bootstrap: "+ bootstrap_options[self.v.get()-1][0])
 			# self.info_label.insert(END, self.get_time()+"Bootstrapping changed to: "+bootstrap_options[self.choice_bs_option-1][0]+"\n")
-			print(self.v.get())
+			print((self.v.get()))
 		
 		self.small_bs_subframe = Frame(self.bootstrap_frame)
 		self.small_bs_subframe.grid(sticky=W, row=2, column=1)

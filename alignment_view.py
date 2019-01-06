@@ -2,8 +2,8 @@
 # tkinter window for settings
 # written by Philipp Resl
 import os
-import Tkinter as tk
-from ScrolledText import ScrolledText
+import tkinter as tk
+from tkinter.scrolledtext import ScrolledText
 
 #import ttk
 #import tkFileDialog, tkMessageBox

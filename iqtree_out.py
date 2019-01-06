@@ -1,30 +1,20 @@
 #! /usr/bin/env python
-# tkinter Frame for partition selection
+# iqtree output window
 # written by Philipp Resl
 # thanks to StackOverflow User jfs: https://stackoverflow.com/questions/665566/redirect-command-line-results-to-a-tkinter-gui
 import sys, os
 from ScrollableFrame import *
 from subprocess import Popen, PIPE, STDOUT
 from threading import Thread
-from ScrolledText import ScrolledText
+from tkinter.scrolledtext import ScrolledText
+import tkinter.ttk as ttk
+import tkinter as tk
+from queue import Queue, Empty
 import shlex
 import itertools
 import signal
+import platform
 
-try:
-	import Tkinter as tk
-except ImportError:
-	import tkinter as tk
-
-try:
-	import ttk
-	py3 = 0
-	from Queue import Queue, Empty
-except ImportError:
-	import tkinter.ttk as ttk
-	from queue import Queue, Empty
-	py3 = 1
-	
 def iter_except(function, exception):
     try:
         while True:
@@ -39,17 +29,12 @@ class IqtreeWindow():
 	partition_command = ""
 	wd = "~"
 	
-	def jump_to_selection(self, ef):
-		selection = self.checkpoints.curselection()
-		#print selection[0]
-		line = self.checkpoints_dict[self.checkpoints.get(selection[0])]
-		print line
-		self.output_label.mark_set("section", "%s.1"%line)
-		self.output_label.see("section")
+
 		
 	def __init__(self, master, settings):
 		self.settings = settings
 		self.master = master
+		self.master.resizable(False, False)
 		self.master.protocol( "WM_DELETE_WINDOW", self.close)
 		self.master.title("iqtree Output")
 		self.checkpoints = Listbox(self.master)
@@ -65,7 +50,13 @@ class IqtreeWindow():
 		self.checkpoints_dict["Start of run"] = self.line_number
 		self.checkpoints.insert(END, "Start of run")
 		
-	
+	def jump_to_selection(self, ef):
+		selection = self.checkpoints.curselection()
+		line = self.checkpoints_dict[self.checkpoints.get(selection[0])]
+		print(line)
+		self.output_label.mark_set("section", "%s.1"%line)
+		self.output_label.see("section")
+
 	def display(self, text):
 		self.line_number += 1
 		self.displayed_output = str(self.line_number) + " " + text
@@ -99,10 +90,14 @@ class IqtreeWindow():
 		self.partition_command = partition_command
 		
 	def spawn_process(self):
-		print "Command is:", self.command
+		print("Command is:", self.command)
 		#cmd_list = shlex.split(self.command)
+		if "Windows" in platform.system():
+			separator="\\"
+		else:
+			separator="/"
+		os.chdir(self.settings.wd + separator + self.settings.analysisname)
 		self.process = Popen(self.command, stdout=PIPE, stderr=STDOUT, universal_newlines=True, shell=True)
-		#self.process = Popen("iqtree", stdout=PIPE, stderr=STDOUT, universal_newlines=True, shell=False, cwd=self.settings.wd)
 
 		q = Queue(maxsize=1024)
 		t = Thread(target=self.reader_thread, args=[q])
@@ -110,10 +105,9 @@ class IqtreeWindow():
 		t.start()
 		self.update(q)
 
-		
 	def reader_thread(self, q):
 		# Read subprocess output and put it into the queue.
-		print "READING"
+		print("READING")
 		try:
 			with self.process.stdout as pipe:
 				for line in iter(pipe.readline, b''):

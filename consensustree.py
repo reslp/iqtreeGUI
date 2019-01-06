@@ -2,9 +2,9 @@
 # tkinter window for creating consensus trees
 # written by Philipp Resl
 import os
-import Tkinter as tk
-import ttk
-import tkFileDialog, tkMessageBox
+import tkinter as tk
+import tkinter.ttk
+import tkinter.filedialog, tkinter.messagebox
 from iqtree_out import *
 
 
@@ -13,14 +13,14 @@ class ConsensusTreeWindow():
 	target_filename = ""
 	
 	def load_tree(self):
-		self.filename = tkFileDialog.askopenfilename(initialdir = "~",title = "Select multi tree file")
+		self.filename = tkinter.filedialog.askopenfilename(initialdir = "~",title = "Select multi tree file")
 		if self.filename == "":
 			self.tree_file_label.configure(text="no treefile loaded")
 		else:
 			self.tree_file_label.configure(text=self.filename)
 	
 	def load_target_tree(self):
-		self.target_filename = tkFileDialog.askopenfilename(initialdir = "~",title = "Select a target tree file")
+		self.target_filename = tkinter.filedialog.askopenfilename(initialdir = "~",title = "Select a target tree file")
 		if self.filename == "":
 			self.sup_label.configure(text="no target tree specified")
 		else:
@@ -121,10 +121,10 @@ class ConsensusTreeWindow():
 		self.prec_entry.grid(row=17, column=5, sticky=tk.W+tk.N)
 		
 		def create_consensus():
-			print self.settings
+			print(self.settings)
 			cmd = self.settings.iqtree_path
 			if self.filename == "":
-				tkMessageBox.showinfo("No trees", "You need to specify a file with trees to ccompute a consensus tree.")
+				tkinter.messagebox.showinfo("No trees", "You need to specify a file with trees to ccompute a consensus tree.")
 				return
 			else:
 				cmd += " -t %s" % self.filename
@@ -135,19 +135,19 @@ class ConsensusTreeWindow():
 			try:
 				minsup = float(self.minsup_entry.get())
 				if minsup < 0 and minsup > 1:
-					tkMessageBox.showinfo("minsup", "Specified value for -minsup is wrong.\nAllowed are values between 0 and 1.")
+					tkinter.messagebox.showinfo("minsup", "Specified value for -minsup is wrong.\nAllowed are values between 0 and 1.")
 					return
 				else:
 					cmd += " -minsup %s" % str(minsup).rstrip("0").rstrip(".")
 			except:
-				tkMessageBox.showinfo("minsup", "Specified value for -minsup is wrong.\nAllowed are values between 0 and 1.")
+				tkinter.messagebox.showinfo("minsup", "Specified value for -minsup is wrong.\nAllowed are values between 0 and 1.")
 				return
 			try:
 				bi = int(self.bi_entry.get())
 				if bi > 0:
 					cmd += " -bi %d" % bi
 			except:
-				tkMessageBox.showinfo("bi", "Specified value for -bi is wrong.\nAllowed are integer values.")
+				tkinter.messagebox.showinfo("bi", "Specified value for -bi is wrong.\nAllowed are integer values.")
 				return
 			if self.target_filename != "":
 				cmd += " -sup %s" % self.target_filename
@@ -157,15 +157,15 @@ class ConsensusTreeWindow():
 					scale = int(self.scale_entry.get())
 					cmd += " -scale %d" % scale
 				except:
-					tkMessageBox.showinfo("scale", "Specified value for -scale is wrong.\nAllowed are integer values.")
+					tkinter.messagebox.showinfo("scale", "Specified value for -scale is wrong.\nAllowed are integer values.")
 					return
 				try:
 					prec = float(self.prec_entry.get())
 					cmd += " -prec %d" % prec
 				except:
-					tkMessageBox.showinfo("prec", "Specified value for -prec is wrong.\nAllowed are numbers.")
+					tkinter.messagebox.showinfo("prec", "Specified value for -prec is wrong.\nAllowed are numbers.")
 					return
-			print cmd
+			print(cmd)
 			self.spawn_iqtree_subprocess(cmd, self.settings)
 			
 		self.apply_button = tk.Button(self.settings_frame, text="Compute Consensus tree", command=create_consensus)

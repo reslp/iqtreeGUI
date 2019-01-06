@@ -2,9 +2,9 @@
 # tkinter window for computing Robinson-Foulds distances
 # written by Philipp Resl
 import os
-import Tkinter as tk
-import ttk
-import tkFileDialog, tkMessageBox
+import tkinter as tk
+import tkinter.ttk
+import tkinter.filedialog, tkinter.messagebox
 from iqtree_out import *
 
 
@@ -13,14 +13,14 @@ class RobinsonFouldsWindow():
 	treeset2 = ""
 	
 	def load_tree1(self):
-		self.treeset1 = tkFileDialog.askopenfilename(initialdir = "~",title = "Select multi tree file")
+		self.treeset1 = tkinter.filedialog.askopenfilename(initialdir = "~",title = "Select multi tree file")
 		if self.treeset1 == "":
 			self.tree_file_label.configure(text="no treefile loaded")
 		else:
 			self.tree1_file_label.configure(text=self.treeset1)
 	
 	def load_tree2(self):
-		self.treeset2 = tkFileDialog.askopenfilename(initialdir = "~",title = "Select a target tree file")
+		self.treeset2 = tkinter.filedialog.askopenfilename(initialdir = "~",title = "Select a target tree file")
 		if self.treeset2 == "":
 			self.tree2_file_label.configure(text="no target tree specified")
 		else:
@@ -91,7 +91,7 @@ class RobinsonFouldsWindow():
 		self.settings_frame.rowconfigure(18, minsize=20)
 		
 		def calc():
-			print self.settings
+			print(self.settings)
 			cmd = self.settings.iqtree_path
 			if self.treeset1 != "" and self.treeset2 != "":
 				cmd += " -rf %s" % self.treeset1
@@ -102,9 +102,9 @@ class RobinsonFouldsWindow():
 				if self.rf_adj_var.get() == 1:
 					cmd += " -rf_adj %s" % self.treeset1
 			else:
-				tkMessageBox.showinfo("No input trees", "You need to specify at least one tree file.")
+				tkinter.messagebox.showinfo("No input trees", "You need to specify at least one tree file.")
 				return
-			print cmd
+			print(cmd)
 			self.spawn_iqtree_subprocess(cmd, self.settings)
 
 				

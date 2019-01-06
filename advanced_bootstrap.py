@@ -2,9 +2,9 @@
 # tkinter window for settings
 # written by Philipp Resl
 import os
-import Tkinter as tk
-import ttk
-import tkFileDialog, tkMessageBox
+import tkinter as tk
+import tkinter.ttk
+import tkinter.filedialog, tkinter.messagebox
 
 class AdvancedBSWindow():
 	wbtvar = 0
@@ -71,7 +71,7 @@ class AdvancedBSWindow():
 		def wbt():
 			if self.wbtlvar.get() == 1:
 				self.wbtlvar.set(0)
-			print #change!!
+			print() #change!!
 			
 		self.wbt = tk.Checkbutton(self.settings_frame, text="Write bootstrap trees to .ufboot file. (-wbt)", command=wbt, variable=self.wbtvar)
 		self.wbt.grid(row=10, column=1, sticky=tk.W)
@@ -80,7 +80,7 @@ class AdvancedBSWindow():
 		def wbtl():
 			if self.wbtvar.get() == 1:
 				self.wbtvar.set(0)
-			print #change!!
+			print() #change!!
 		
 		
 		self.wbtl = tk.Checkbutton(self.settings_frame, text="Write bootstrap trees to .ufboot file\nincluding branch lengths. (-wbtl)", command=wbtl, variable=self.wbtlvar)
@@ -98,7 +98,7 @@ class AdvancedBSWindow():
 				self.master.destroy()
 				
 			except ValueError:
-				tkMessageBox.showinfo("Error", "Some of the entered values are incorrect")
+				tkinter.messagebox.showinfo("Error", "Some of the entered values are incorrect")
 		
 		self.apply_button = tk.Button(self.settings_frame, text="Apply & Close", command=apply)
 		self.apply_button.grid(row=11, column=12, sticky=tk.W)

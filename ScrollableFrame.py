@@ -3,12 +3,12 @@
 import sys
 
 try:
-    from Tkinter import *
+    from tkinter import *
 except ImportError:
     from tkinter import *
 
 try:
-    import ttk
+    import tkinter.ttk
     py3 = 0
 except ImportError:
     import tkinter.ttk as ttk

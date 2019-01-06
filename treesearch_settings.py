@@ -2,15 +2,15 @@
 # tkinter window for treesearch settings
 # written by Philipp Resl
 import os
-import Tkinter as tk
-import ttk
-import tkFileDialog, tkMessageBox
+import tkinter as tk
+import tkinter.ttk
+import tkinter.filedialog, tkinter.messagebox
 
 class TreesearchSettingsWindow():
 	filename = ""
 	
 	def load_tree(self):
-		self.filename = tkFileDialog.askopenfilename(initialdir = "~",title = "Select starting tree")
+		self.filename = tkinter.filedialog.askopenfilename(initialdir = "~",title = "Select starting tree")
 		self.start_tree_path.grid(row=3,column=2, sticky=tk.W)
 		self.start_tree_path.configure(text=self.filename)
 		
@@ -103,7 +103,7 @@ class TreesearchSettingsWindow():
 				data.sprrad = int(self.sprrad_entry.get())
 				self.master.destroy()	
 			except ValueError:
-				tkMessageBox.showinfo("Error", "Some of the entered values are incorrect")
+				tkinter.messagebox.showinfo("Error", "Some of the entered values are incorrect")
 		
 		self.apply_button = tk.Button(self.settings_frame, text="Apply & Close", command=apply)
 		self.apply_button.grid(row=19, column=12, sticky=tk.W)

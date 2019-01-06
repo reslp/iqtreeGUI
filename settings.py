@@ -1,20 +1,20 @@
 #! /usr/bin/env python
 # tkinter window for settings
 # written by Philipp Resl
-import ConfigParser
-import tkFileDialog
+import configparser
+import tkinter.filedialog
 import os
 import sys
 
 try:
-	import Tkinter as tk
+	import tkinter as tk
 except ImportError:
 	import tkinter as tk
 
 try:
-	import ttk
+	import tkinter.ttk
 	py3 = 0
-	from Queue import Queue, Empty
+	from queue import Queue, Empty
 except ImportError:
 	import tkinter.ttk as ttk
 	from queue import Queue, Empty
@@ -29,26 +29,27 @@ def resource_path(relative):
 	
 class SettingsWindow():	
 	def read_config_file(self):
-		config = ConfigParser.ConfigParser()
-		print self.master.config_path
+		config = configparser.ConfigParser()
+		#print(self.master.config_path)
 		try:
-			print self.config_file
+			print(self.config_file)
 			config.read(self.config_file)
 			self.path_iq = config.get('Settings', 'iqtree')
 			self.version = config.get('Settings', 'version')
 			self.path_wd = config.get('Settings', 'wd')
+			self.analysisname = config.get('Settings', 'analysisname')
 		except:
-			print "read error"
+			print("read error")
 			#ttk.tkMessageBox.showerror("Error", "Config file error")
 			
 	def load_iqtree(self):
-		filename = tkFileDialog.askopenfilename(initialdir = "~",title = "Select IQ-Tree executable")
+		filename = tkinter.filedialog.askopenfilename(initialdir = "~",title = "Select IQ-Tree executable")
 		self.iqtree_path_entry.delete(0, tk.END)
 		self.iqtree_path_entry.insert(tk.END, filename)
 		self.path_iq = filename
 	
 	def load_wd(self):
-		dirname = tkFileDialog.askdirectory(initialdir = "~",title = "Select working directory")
+		dirname = tkinter.filedialog.askdirectory(initialdir = "~",title = "Select working directory")
 		self.wd_entry.delete(0, tk.END)
 		self.wd_entry.insert(tk.END, dirname)
 		self.path_wd = dirname
@@ -69,7 +70,7 @@ class SettingsWindow():
 		self.description.grid(row=1,column=1, sticky=tk.W, columnspan=5)
 		self.settings_frame.rowconfigure(2, minsize=30)
 		
-		#self.read_config_file()
+		self.read_config_file()
 		self.label= tk.Label(self.settings_frame, text="Path to iqtree:")
 		self.label.grid(row=3, column=1)
 		self.iqtree_path_entry = tk.Entry(self.settings_frame)
@@ -81,26 +82,34 @@ class SettingsWindow():
 		self.label_wd = tk.Label(self.settings_frame, text="Working directory:")
 		self.label_wd.grid(row=4,column=1, columnspan=2, sticky=tk.W)
 
-		
-		
+
 		# this is currently not working, iqtree seems to produce output in the alignment directory
 		self.wd_entry = tk.Entry(self.settings_frame)
 		self.wd_entry.insert(tk.END, data.wd)
 		self.change_but_wd = tk.Button(self.settings_frame, text="Change", command=self.load_wd)
 		self.wd_entry.grid(row=4,column=2)
 		self.change_but_wd.grid(row=4, column=3)
+
+		self.label_analysisname = tk.Label(self.settings_frame, text="Analysis name:")
+		self.label_analysisname.grid(row=5,column=1, columnspan=2, sticky=tk.W)
+		self.analysisname_entry = tk.Entry(self.settings_frame)
+		self.analysisname_entry.insert(tk.END, data.analysisname)
+		self.analysisname_entry.grid(row=5,column=2)
+		#self.change_but_wd.grid(row=5, column=3)
 		
 		
 		def set_config_file():
 			data.iqtree_path = self.iqtree_path_entry.get()
 			data.wd = self.wd_entry.get()
-			config = ConfigParser.ConfigParser()
+			data.analysisname = self.analysisname_entry.get()
+			config = configparser.ConfigParser()
 		
-			configfile = open(self.config_file, 'wb')
+			configfile = open(self.config_file, 'w')
 			config.add_section('Settings')
 			config.set('Settings', 'iqtree', data.iqtree_path)
 			config.set('Settings', 'wd', data.wd)
 			config.set('Settings', 'version', data.version)
+			config.set('Settings', 'analysisname', data.analysisname)
 			config.write(configfile)
 			configfile.close()
 			self.master.destroy()

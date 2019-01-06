@@ -2,9 +2,9 @@
 # tkinter window for treesearch settings
 # written by Philipp Resl
 import os
-import Tkinter as tk
-import ttk
-import tkFileDialog, tkMessageBox
+import tkinter as tk
+import tkinter.ttk
+import tkinter.filedialog, tkinter.messagebox
 
 class ModelselectionSettingsWindow():
 	def __init__(self, master, data):
@@ -134,14 +134,14 @@ class ModelselectionSettingsWindow():
 		self.not_yet.grid(row=17,column=1, sticky=tk.W, columnspan=5)
 		
 		def apply():
-			print data.__dict__	
+			print(data.__dict__)	
 			try:
-				print "a"
+				print("a")
 				data.testonly = self.testonly_var.get()
 				data.test = self.test_var.get()
 				data.mf = self.testnewonly_var.get()
 				data.mfp = self.testnew_var.get()
-				print "b"
+				print("b")
 				data.lm_type = self.lm_options.index(self.lm_var.get())
 				data.merge = self.merge_var.get()
 				data.mset = self.mset_options.index(self.mset_var.get())
@@ -152,10 +152,10 @@ class ModelselectionSettingsWindow():
 				data.merit = self.merit_options.index(self.merit_var.get())
 				data.mtree = self.mtree_var.get()
 				data.mredo = self.mredo_var.get()
-				print data.__dict__				
+				print(data.__dict__)				
 				self.master.destroy()	
 			except ValueError:
-				tkMessageBox.showinfo("Error", "Some of the entered values are incorrect")
+				tkinter.messagebox.showinfo("Error", "Some of the entered values are incorrect")
 		
 		self.apply_button = tk.Button(self.settings_frame, text="Apply & Close", command=apply)
 		self.apply_button.grid(row=19, column=12, sticky=tk.W)

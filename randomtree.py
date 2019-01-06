@@ -2,9 +2,9 @@
 # tkinter window for computing Robinson-Foulds distances
 # written by Philipp Resl
 import os
-import Tkinter as tk
-import ttk
-import tkFileDialog, tkMessageBox
+import tkinter as tk
+import tkinter.ttk
+import tkinter.filedialog, tkinter.messagebox
 from iqtree_out import *
 
 
@@ -124,9 +124,9 @@ class RandomTreeWindow():
 			try:
 				ntrees = int(self.r_entry.get())
 			except ValueError:
-				tkMessageBox.showinfo("Wrong value", "Specified number of taxa is incorrect")
+				tkinter.messagebox.showinfo("Wrong value", "Specified number of taxa is incorrect")
 				return	
-			print self.settings.iqtree_path
+			print(self.settings.iqtree_path)
 			cmd = self.settings.iqtree_path
 			if self.r_var.get() == 1:
 				cmd += " -r %d" % ntrees
@@ -144,10 +144,10 @@ class RandomTreeWindow():
 				cmd += " %f" % mean
 				cmd += " %f" % max	
 			except ValueError:
-				tkMessageBox.showinfo("Wrong value", "One of the entered values (min, mean, max) is incorrect")
+				tkinter.messagebox.showinfo("Wrong value", "One of the entered values (min, mean, max) is incorrect")
 				return
 			cmd += " random_trees.trees -redo"
-			print cmd
+			print(cmd)
 			self.spawn_iqtree_subprocess(cmd, self.settings)
 		
 		self.apply_button = tk.Button(self.settings_frame, text="Generate random tree", command=create_random)

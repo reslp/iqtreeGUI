@@ -4,12 +4,12 @@
 import sys
 
 try:
-    from Tkinter import *
+    from tkinter import *
 except ImportError:
     from tkinter import *
 
 try:
-    import ttk
+    import tkinter.ttk
     py3 = 0
 except ImportError:
     import tkinter.ttk as ttk
@@ -43,13 +43,13 @@ class Partition(Frame):
 		self.end_entry = Entry(self, width=6)
 		self.end_entry.grid(row=0,column=5)
 		
-		print self.alignments
+		print(self.alignments)
 		self.part_alignment_var = StringVar()
 		self.part_alignment_var.set(self.alignments[0])
 		
 		def alignOption(which):
 			self.which_alignment = which
-			print which
+			print(which)
 			
 		self.which_partition_model = OptionMenu(self, self.part_alignment_var,  *self.alignments, command=alignOption)
 		self.which_partition_model.grid(row=0,column=6, sticky=N)

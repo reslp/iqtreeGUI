@@ -5,12 +5,12 @@ import sys
 from data_types_settings import *
 
 try:
-    from Tkinter import *
+    from tkinter import *
 except ImportError:
     from tkinter import *
 
 try:
-    import ttk
+    import tkinter.ttk
     py3 = 0
 except ImportError:
     import tkinter.ttk as ttk
@@ -66,7 +66,7 @@ class ModelSelection(Frame):
 				self.v_codon_subst_rate.set(self.model.codon_subst_rate)
 				self.rate_hetero_v.set(self.model.rate_hetero)		
 			if self.model.model_type == "Specify manually":
-				print #not yet implemented
+				print() #not yet implemented
 		if self.model.data_type == "AA":
 			self.aa_type_select.grid(row=0,column=2)
 			self.rate_hetero_select.grid(row=0,column=7)
@@ -217,7 +217,7 @@ class ModelSelection(Frame):
 				self.codon_model_select.grid_forget()
 				self.codon_subs_scheme.grid_forget()
 			self.aa_freq_select.grid_forget()
-			print "Model category: %s" % self.dna_type_v.get()
+			print("Model category: %s" % self.dna_type_v.get())
 			self.dna_model_type=which
 			self.model.model_type = which
 		
@@ -231,7 +231,7 @@ class ModelSelection(Frame):
 		def cbBaseModel(which): 
 			self.dna_base_model = which	
 			self.model.model = which	
-			print which		
+			print(which)		
 	
 		self.base_model_select = OptionMenu(self, self.v_model,  *base_model_options, command=cbBaseModel)
 		
@@ -247,7 +247,7 @@ class ModelSelection(Frame):
 				self.fixed_scheme.grid_forget()
 			self.model.base_freq = which
 			self.dna_base_freq = which
-			print which
+			print(which)
 	
 		self.base_freq_select = OptionMenu(self, self.v_base_freq,  *base_freq_options, command=cbBaseFreq)
 		self.fixed_scheme = Entry(self)
@@ -262,7 +262,7 @@ class ModelSelection(Frame):
 		def cbLiModel_prefix(which):
 			self.dna_li_pre = which
 			self.model.li_model_prefix = which
-			print which
+			print(which)
 		
 		self.li_model_prefix_select = OptionMenu(self, self.v_li_model_prefix,  *li_model_prefix_options, command=cbLiModel_prefix)
 		
@@ -275,7 +275,7 @@ class ModelSelection(Frame):
 		def cbLiModel(which):
 			self.dna_li_model = which
 			self.model.model = which
-			print which
+			print(which)
 		
 		self.li_model_select = OptionMenu(self, self.v_li_model,  *li_model_options, command=cbLiModel)
 		
@@ -287,7 +287,7 @@ class ModelSelection(Frame):
 		def cbCodonModel(which):
 			self.dna_codon_model = which
 			self.model.model = which
-			print which
+			print(which)
 		
 		self.codon_model_select = OptionMenu(self, self.v_codon_model,  *codon_model_options, command=cbCodonModel)
 		
@@ -303,7 +303,7 @@ class ModelSelection(Frame):
 				self.codon_subs_scheme.grid_forget()
 				self.dna_codon_subst=which
 				self.model.codon_subst_rate = which
-			print which
+			print(which)
 		
 		self.codon_subst_rate_select = OptionMenu(self, self.v_codon_subst_rate,  *codon_subst_rate_options, command=cbCodonRateOption)
 		self.codon_subs_scheme = Entry(self)
@@ -343,7 +343,7 @@ class ModelSelection(Frame):
 			self.aa_change_model = which
 			self.model.model = which
 			self.aa_mixture = ""
-			print which
+			print(which)
 		
 		self.aa_exchange_type_select = OptionMenu(self, self.aa_exchange_type_v,  *aa_exchange_model_options, command=ShowChoice_aa_exchange_type)
 		
@@ -377,7 +377,7 @@ class ModelSelection(Frame):
 				self.fixed_aa_scheme.grid(row=0, column=6)
 			else:
 				self.fixed_aa_scheme.grid_forget()
-			print which
+			print(which)
 	
 		self.aa_freq_select = OptionMenu(self, self.v_aa_freq,  *aa_freq_options, command=cbAAFreq)
 
@@ -392,7 +392,7 @@ class ModelSelection(Frame):
 		
 		def ShowChoice_morph_type(which):
 			self.morpho_model = which
-			print which
+			print(which)
 		self.morph_type_select = OptionMenu(self, morph_type_v,  *morph_model_options, command=ShowChoice_morph_type)
 				
 		rate_hetero_options = ["Rate Heterog.", "+I", "+G", "+I+G", "+R", "+I+R"]
@@ -405,7 +405,7 @@ class ModelSelection(Frame):
 			else:
 				self.rate_hetero_user_scheme.grid_forget()
 			self.model.rate_hetero=which	
-			print which
+			print(which)
 		
 		self.rate_hetero_select = OptionMenu(self, self.rate_hetero_v,  *rate_hetero_options, command=ShowChoice_rate_hetero)
 		
@@ -417,20 +417,20 @@ class ModelSelection(Frame):
 
 
 	def get_model(self): #this will be the function to return which model is used
-		print "Returning model..."
+		print("Returning model...")
 		if self.model.rate_hetero=="Rate Heterog.":
 			self.model.rate_hetero = ""
 		if self.model.data_type == "DNA":
 			if self.model.model_type == "Base substitution rates":
 				model = self.model.model + self.model.base_freq + self.model.rate_hetero
-				print "Model will be: %s" % model
+				print("Model will be: %s" % model)
 				return model
 			if self.model.model_type == "Lie Markov models":
 				if self.model.li_model_prefix == "Prefix" or self.model.li_model_prefix == "None":
 					model = self.model.model + self.model.rate_hetero
 				else: 
 					model = self.model.li_model_prefix + self.model.model + self.model.rate_hetero
-				print "Model will be: %s" % model
+				print("Model will be: %s" % model)
 				return model
 			if self.model.model_type == "Codon model":
 				model = self.model.model + "+" + self.model.codon_subst_rate + self.model.rate_hetero
@@ -451,7 +451,7 @@ class ModelSelection(Frame):
 		
 	def __init__(self, master, part_id):
 		self.model = Model()
-		print self.model.__dict__
+		print(self.model.__dict__)
 		
 		Frame.__init__(self, master)
 		self.master = master
