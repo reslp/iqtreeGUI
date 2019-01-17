@@ -1,18 +1,8 @@
 #! /usr/bin/env python
 # add credits...
 import sys
-
-try:
-    from tkinter import *
-except ImportError:
-    from tkinter import *
-
-try:
-    import tkinter.ttk
-    py3 = 0
-except ImportError:
-    import tkinter.ttk as ttk
-    py3 = 1
+from tkinter import *
+import tkinter.ttk as ttk
 
 class ScrollableFrame(Frame):
 	"""
@@ -25,7 +15,7 @@ class ScrollableFrame(Frame):
 	def __init__(self, parent, *args, **kw):
 
 		# scrollbar on right in parent 
-		yscrollbar = Scrollbar(parent, width=32)
+		yscrollbar = Scrollbar(parent, width=15)
 		yscrollbar.pack(side=RIGHT, fill=Y, expand=False)
 
 		# canvas on left in parent

@@ -2,18 +2,8 @@
 # tkinter Frame for partition selection
 # written by Philipp Resl
 import sys
-
-try:
-    from tkinter import *
-except ImportError:
-    from tkinter import *
-
-try:
-    import tkinter.ttk
-    py3 = 0
-except ImportError:
-    import tkinter.ttk as ttk
-    py3 = 1
+from tkinter import *
+import tkinter.ttk as ttk
 
 class Partition(Frame):
 	partition_id = ""

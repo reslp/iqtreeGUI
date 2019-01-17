@@ -15,7 +15,7 @@ import unicodedata
 from tkinter import *
 import tkinter.filedialog, tkinter.messagebox
 from tkinter.scrolledtext import ScrolledText
-import tkinter.ttk
+import tkinter.ttk as ttk
 import platform
 from os.path import expanduser
 from shutil import copy, rmtree
@@ -45,7 +45,7 @@ def resource_path(relative): #needed to load iqtreeGUI icon
 	#return os.path.join(os.environ.get("_MEIPASS2",os.path.abspath(".")),relative)
 	
 ###### main class #######
-class iqtree_GUI:
+class iqtree_GUI(Frame):
 	nthreads = "AUTO"
 	nbootstrap = 1000
 	overwrite=1
@@ -75,6 +75,7 @@ class iqtree_GUI:
 	iqtree_settings = IQtreeSettings()
 	gui_settings = IQtreeGUIConfig()
 	advanced_model_settings	= AutomaticModelSelectionSettings()
+	
 
 	def convert_number(self, s): #function to distinguish between float, int and str when reading from xml file
 		try:
@@ -378,18 +379,19 @@ class iqtree_GUI:
 		filename = "no file name"
 		filename = tkinter.filedialog.askopenfilename(initialdir = self.gui_settings.wd,title = "Select alignment")
 		print(filename)
+		print("Number of alignments: %s" % str(len(self.alignments)))
 		if "Windows" in platform.system():
 			filename = filename.replace("/","\\")
 		if filename != "" and filename != "no file name":
-			self.alignments.append(Alignment(self.alignment_scroll_frame, align_id="Alignment "+str(len(self.alignments)+1)+":  ", path = filename, number=len(self.alignments)+1))
+			self.alignments.append(Alignment(self.alignment_scroll_frame, align_id="Alignment "+str(len(self.alignments)+1)+":  ", path = filename, number=len(self.alignments)+1, alignment_list = self.alignments, info_label=self.alignment_info_label))
 			self.alignments[-1].grid(sticky=W)
 			self.align_offset += 30
 			self.alignment_scroll_frame.update()
 			self.alignment_info_label.config(text="Alignments: %s Alignment(s) loaded" % str(len(self.alignments)))
-		
-		
+	
+
 	def create_partition(self):
-		alignment_names = [element.alignment_id.strip(": ") for element in self.alignments]
+		alignment_names = ["Alignment %s" % element.alignment_no for element in self.alignments]
 		if len(alignment_names) == 0: # in case there is no alignment loaded, return. probably this needs a message box
 			print("no alignments loaded")
 			tkinter.messagebox.showerror("Error", "First specify at least one alignment.")
@@ -756,7 +758,7 @@ class iqtree_GUI:
 		self.master = top
 		top.geometry("1000x593")#+330+201")
 		top.title("iqtreeGUI Alpha")
-		top.resizable(width=True, height=True) # set to True to enable the workaround for the disappearing buttons on Mojave
+		#top.resizable(width=True, height=True) # set to True to enable the workaround for the disappearing buttons on Mojave
 		top.grid_rowconfigure(0, weight=1)
 		top.grid_columnconfigure(0, weight=1)
 		#top.iconbitmap(resource_path("iqtreegui.ico"))
@@ -769,7 +771,7 @@ class iqtree_GUI:
 		
 
 #### BASIC NOTEBOOK #######
-		self.notebook = tkinter.ttk.Notebook(top)
+		self.notebook = ttk.Notebook(top)
 		self.notebook.bind("<ButtonRelease-1>", self.update_notebook)
 		
 		# this was used due to a bug in tk/tcl
@@ -1177,8 +1179,6 @@ class iqtree_GUI:
 		self.menubar.add_cascade(label="Special Applications", menu=self.special_menu)
 		
 		top.config(menu=self.menubar)
-
-
 
 if __name__ == '__main__':
 	root = Tk()
