@@ -50,14 +50,14 @@ You can then start iqtreeGUI directly from the newly downloaded directory:
 
 `python iqtreegui.py`
 
-**Note:** iqtreeGUI needs Python3
+**Note:** iqtreeGUI needs Python3. I recommend installing [Anaconda] (https://www.anaconda.com).
 
 
 
 
 Building executables
 ===================
-If you are on Linux or MacOS you may execute the `build_all.sh` script to build iqtreeGUI for Linux, MacOS and Windows. This requires pyinstaller and Docker to be installed.
+If you are on Linux or MacOS you may execute the `build_all.sh` script to build iqtreeGUI for Linux and Windows. This requires pyinstaller and Docker to be installed.
 
 **Locally from source:**
 
