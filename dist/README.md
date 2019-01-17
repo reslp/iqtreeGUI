@@ -1,6 +1,6 @@
 Changelog and Version History
 =========
-**Version 06012019:**
+**Version 17012019:**
 
 - Added Remove-Button for alignments
 - Several small bug-fixes
