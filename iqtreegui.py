@@ -1183,6 +1183,10 @@ class iqtree_GUI(Frame):
 if __name__ == '__main__':
 	root = Tk()
 	top = iqtree_GUI(root)
+	#print(root.tk.exprstring('$tcl_library')) #for checking the tcl/tk version
+	#print(root.tk.exprstring('$tk_library'))
 	root.mainloop()
+
+
 	
 	#vp_start_gui()

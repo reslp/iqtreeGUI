@@ -1,5 +1,9 @@
 Changelog and Version History
 =========
+**Version 18012019:**
+
+- Fixed broken MacOS executable
+
 **Version 17012019:**
 
 - Added Remove-Button for alignments

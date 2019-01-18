@@ -9,6 +9,8 @@ Description
 
 iqtreeGUI is a graphical front-end for [IQ-TREE](http://www.iqtree.org). The goal is to implement all features of IQ-TREE 1.6.*. It is under active development and therefore several features are still missing (eg. a GUI for likelihood mapping, topology tests). iqtreeGUI is written in Python3 and executables are available for Windows, Linux and MacOS.
 
+**Note:** In the MacOS version on MacOS 10.14 of iqtreeGUI at start some buttons and menus will not display text correctly. This is due to a bug in Tcl/Tk framework. Till the bug in Tcl/Tk gets removed, simply resize the window slightly and everythingh should look fine.
+
 ![Screenshot of iqtreeGUI](screenshot.png)
 *Figure: iqtreeGUi running on MacOS High Sierra*
 
@@ -76,7 +78,9 @@ Make sure to install and configure pyinstaller correctly for your operating syst
 
 The cloned repository already contains everything you need and if you have python installed you may execute iqtreegui with the command: `python iqtreegui.py`
 
-2. To create a stand-alone executable of iqtreegui use pyinstaller: `pyinstaller iqtreegui.spec`
+2. To create a stand-alone executable of iqtreegui use pyinstaller: `pyinstaller iqtreegui.spec` for the Linux and Windows version
+`pyinstaller iqtreegui_mac.spec` for the Mac version
+
 
 **Compile Linux and Windows version with Docker on Mac:**
 
