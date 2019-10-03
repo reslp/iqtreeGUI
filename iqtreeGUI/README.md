@@ -1,24 +1,27 @@
 iqtreeGUI
 =========
 
-This repository contains source code and executables of a Graphic User Interface for [IQ-TREE] (www.iqtree.org). 
+This repository contains source code and executables for a graphical user interface for [IQ-TREE](http://www.iqtree.org). 
  
 
 Description
 ===========
 
-iqtreeGUI is a graphical front-end for [IQ-TREE] (www.iqtree.org). The goal is to implement all features of IQ-TREE 1.6.1. It is under active development and so several features are still missing (eg. a GUI for likelihood mapping, topology tests). iqtreeGUI is written in Python. Executables are created with pyinstaller.
+iqtreeGUI is a graphical front-end for [IQ-TREE](http://www.iqtree.org). The goal is to implement all features of IQ-TREE 1.6.*. It is under active development and therefore several features are still missing (eg. a GUI for likelihood mapping, topology tests). iqtreeGUI is written in Python3 and executables are available for Windows, Linux and MacOS.
+
+**Note:** In the MacOS version on MacOS 10.14 of iqtreeGUI at start some buttons and menus will not display text correctly. This is due to a bug in Tcl/Tk framework. Till the bug in Tcl/Tk gets removed, simply resize the window slightly and everythingh should look fine.
 
 ![Screenshot of iqtreeGUI](screenshot.png)
 *Figure: iqtreeGUi running on MacOS High Sierra*
 
 A work in progress
 ==============
-One of the great things about IQ-TREE is that is has lots of possibilities to combine different parameters and analyses. While iqtreeGUI aims to provide a graphical way to access all these features, unfortunately I don't have the capacity to test every possible combination of parameters IQ-TREE allows. At the moment iqtreeGUI is still under active developement. Therefore there may still be a large number of bugs. I am greatful for every bug report I receive. Reporting bugs will help to improve iqtreeGUI.
+One of the great things about IQ-TREE is that is has lots of possibilities to combine different parameters and analyses. While iqtreeGUI aims to provide a graphical way to access all these features, it is almost impossible to test every possible combination of parameters IQ-TREE allows. At the moment iqtreeGUI is still under active developement. Therefore there may still be a large number of bugs. I am greatful for every bug report I receive. Reporting bugs will help to improve iqtreeGUI.
 
-Implemented Features
+Features
 ===========
-iqtreegui amis to implement all features of IQ-TREE v1.6.1 
+
+iqtreeGUI aims to implement all features of IQ-TREE v1.6. It has been tested with v1.6.1 but it may also run with newer versions of IQ-TREE.
 
 Currently implemented features:
 
@@ -38,11 +41,25 @@ Obtaining and configuring iqtreeGUI
 ================
 Executables are available for Linux, MacOS and Windows. The Windows and Linux versions were built using a combination of Docker and pyinstaller. 
 
-For iqtreeGUI to work you will also need to download and install [IQ-TREE] (www.iqtree.org). Once you have started iqtreeGUI you will have to set the correct path to the IQ-TREE executable. Click on iqtree-GUI -> GUI settings and select the iqtree executable.
+For iqtreeGUI to work you will also need to download and install [IQ-TREE](http://www.iqtree.org). Once you have started iqtreeGUI you will have to set the correct path to the IQ-TREE executable. Click on iqtreeGUI -> GUI settings and select the iqtree executable.
+
+Another possibility is to download the complete source code using git clone:
+
+`git clone https://github.com/reslp/iqtreeGUI`
+
+This will download the complete iqtreeGUI repository, meaning that it will download the most recent version of iqtreeGUI. This version may differ from the provided binaries and may contain additional features and bugs.
+You can then start iqtreeGUI directly from the newly downloaded directory:
+
+`python iqtreegui.py`
+
+**Note:** iqtreeGUI needs Python3. I recommend installing [Anaconda] (https://www.anaconda.com).
+
+
 
 
 Building executables
 ===================
+If you are on Linux or MacOS you may execute the `build_all.sh` script to build iqtreeGUI for Linux and Windows. This requires pyinstaller and Docker to be installed.
 
 **Locally from source:**
 
@@ -51,7 +68,7 @@ If you would like to use the very latest version of iqtreegui you can also build
 Prerequisites to build from source:
 
 - MacOS X, Linux or Windows operating system
-- [python](http://www.python.org) 2.7.8+, which comes with most Unix like systems
+- [python](http://www.python.org) 3.6+, which comes with most Unix like systems
 - [pyinstaller](http://www.pyinstaller.org) v3.3.1, for creating the executable
 - git
 
@@ -61,21 +78,23 @@ Make sure to install and configure pyinstaller correctly for your operating syst
 
 The cloned repository already contains everything you need and if you have python installed you may execute iqtreegui with the command: `python iqtreegui.py`
 
-2. To create a stand-alone executable of iqtreegui use pyinstaller: `pyinstaller iqtreegui.spec`
+2. To create a stand-alone executable of iqtreegui use pyinstaller: `pyinstaller iqtreegui.spec` for the Linux and Windows version
+`pyinstaller iqtreegui_mac.spec` for the Mac version
+
 
 **Compile Linux and Windows version with Docker on Mac:**
 
 If you have Docker installed you can also compile the Linux and Windows versions within a Docker container:
 
 1. First you have to install the appropriate container: 
-`docker pull cdrx/pyinstaller-linux:python2`
+`docker pull cdrx/pyinstaller-linux:python3`
 or
-`docker pull cdrx/pyinstaller-windows:python2`
+`docker pull cdrx/pyinstaller-windows:python3`
 2. Clone repository: `git clone https://github.com/reslp/iqtreegui`
 3. Compile the desired version of iqtreeGUI by executing this in the iqtreeGUI source directory:
-`docker run -v "$(pwd):/src/" cdrx/pyinstaller-linux:python2 "apt-get update -y && apt-get install -y python-tk && pyinstaller --clean -y --dist ./dist/linux --workpath /tmp *.spec"`
+`docker run -v "$(pwd):/src/" cdrx/pyinstaller-linux:python3 "apt-get update -y && apt-get install -y python3-tk && pyinstaller --clean -y --dist ./dist/linux --workpath /tmp *.spec"`
 or
-`docker run -v "$(pwd):/src/" cdrx/pyinstaller-windows:python2`
+`docker run -v "$(pwd):/src/" cdrx/pyinstaller-windows:python3`
 
 How to cite?
 ============
@@ -87,7 +106,7 @@ LICENSE
 
 iqtreeGUI a graphical user interface for IQ-TREE
 
-Copyright (C) 2018  Philipp Resl
+Copyright (C) 2019  Philipp Resl
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License

@@ -22,3 +22,14 @@ binner/testdata/scaffolds.fasta.index.4.bt2
 binner/testdata/scaffolds.fasta.index.rev.1.bt2
 binner/testdata/scaffolds.fasta.index.rev.2.bt2
 binner/testdata/scaffolds.fasta.sam
+python-scripts/
+reslp.github.io/
+lichen_genomics/
+blog/
+concat.py/
+correlate/
+genomics/
+dockerfiles/
+binner/README.md
+binner/README.md
+binner/README.md
