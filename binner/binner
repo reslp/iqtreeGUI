@@ -1,0 +1,150 @@
+#!/bin/bash
+# written by Philipp Resl, Oct. 2019, github.com/reslp/binner
+
+usage() { 
+	echo "Welcome to binner. A script to quickly run metagenomic binning software using Docker."
+	echo
+	echo "Usage: $0 [-v] [-a <assembly_file>] [-f <read_file1>] [-r <read_file2>] [-m maxbin,metabat,blobtools,concoct] [-t nthreads] [[-b /path/to/diamonddb -p /path/to/prot.accession2taxid]]" 
+	echo
+	echo "Options:"
+	echo "	-a <assembly_file> Assembly file in FASTA format (needs to be in current folder)"
+	echo "	-f <read_file1> Forward read file in FASTQ format (can be gzipped)"
+	echo "	-r <read_file2> Reverse read file in FASTQ format (can be gzipped)"
+	echo "	-m <maxbin,metabat,blobtools,concoct> specify binning software to run."
+	echo "	   Seperate multiple options by a , (eg. -o maxbin,blobtools)."
+	echo "	-t number of threads for multi threaded parts"
+	echo "	-v Display program version"
+	echo
+	echo "Options specific to blobtools:"
+	echo "	The blobtools container used here uses diamond instead of blast to increase speed."
+	echo "	Options needed when blobtools should be run. The blobtools container used here uses diamond instead of blast to increase speed."
+	echo "  	-b full (absolute) path to diamond database"
+	echo "  	-p full (absolute) path to directory containing prot.accession2taxid file provided by NCBI"
+	1>&2; exit 1; }
+	
+version() {
+	echo "binner version 0.1"
+	exit 0
+}
+
+while getopts ":t:m:a:f:r:vb:p:" option;
+	do
+		case "${option}"
+		in
+			a) ASSEMBLY=${OPTARG};;
+			f) R1=${OPTARG};;
+			r) R2=${OPTARG};;
+			v) version;;
+			m) OPTIONS=${OPTARG};;
+			t) THREADS=${OPTARG};;
+			b) DIAMONDDB=${OPTARG};;
+			p) PROTID=${OPTARG};;
+			*) usage;;
+			?) usage;;
+		esac
+	done
+if [ $OPTIND -eq 1 ]; then usage; fi
+#echo $OPTIONS
+
+# this needs to be set because on Linux docker created files will be owned by root by default.
+unset DOCKER_USER
+if [[ "$OSTYPE" == "linux-gnu" ]]; then
+ DOCKER_USER="--user $(id -u):$(id -g)"
+elif [[ "$OSTYPE" == "darwin"* ]]; then #nothing to be done on MacOS
+ DOCKER_USER=""
+fi
+
+if [[ ! -f "$ASSEMBLY".index.1.bt2 ]]; then
+	echo "(binner) No Bowtie2 index file found. Creating Bowtie2 index..."
+	docker run -t --rm $DOCKER_USER -v $(pwd):/data/ reslp/bowtie2 bowtie2-build /data/$ASSEMBLY /data/$ASSEMBLY.index -q
+fi
+
+if [[ ! -f "$ASSEMBLY".bam ]]; then
+	echo "(binner) No BAM file found. Will perform read mapping with bowtie2 ..."
+	docker run -t --rm $DOCKER_USER -v $(pwd):/data/ reslp/bowtie2 bowtie2 -p $THREADS -q --phred33 --fr -x /data/$ASSEMBLY.index -1 /data/$R1 -2 /data/$R2 -S /data/$ASSEMBLY.sam --quiet
+	echo "(binner) Converting SAM to BAM ..."
+	docker run -t --rm $DOCKER_USER -v $(pwd):/data/ reslp/samtools samtools view -bS /data/$ASSEMBLY.sam -o /data/$ASSEMBLY.bam
+	docker run -t --rm $DOCKER_USER -v $(pwd):/data/ reslp/samtools samtools sort -o /data/$ASSEMBLY.bam /data/$ASSEMBLY.bam
+	echo "(binner) Will index BAM file ..."
+	docker run -t --rm $DOCKER_USER -v $(pwd):/data/ reslp/samtools samtools index /data/$ASSEMBLY.bam
+fi
+
+if [[ $OPTIONS == *"maxbin"* ]]; then
+	echo "(binner) Will run MaxBin"
+	mkdir -p maxbin
+	# these docker commands are not optimal because the create files as the root user.
+	# passing UID and GID don't work in this case because of the way maxbin is set up.
+	# I have not yet found a way around this.
+	docker run -t -v $(pwd):/data/ reslp/samtools samtools idxstats /data/$ASSEMBLY.bam > maxbin/$ASSEMBLY.idxstats
+	cut -f1,3 maxbin/$ASSEMBLY.idxstats > maxbin/$ASSEMBLY.counts
+	docker run -t -v $(pwd):/data/ reslp/maxbin run_MaxBin.pl -contig /data/$ASSEMBLY -abund /data/maxbin/$ASSEMBLY.counts -thread $THREADS -out /data/maxbin/maxbin_bin_out
+fi
+
+if [[ $OPTIONS == *"metabat"* ]]; then
+	echo "(binner) Will run MetaBat"
+	mkdir -p metabat
+	docker run -t $DOCKER_USER -v $(pwd):/data/ --rm reslp/metabat jgi_summarize_bam_contig_depths --outputDepth /data/metabat/metabat_depth.txt --pairedContigs /data/metabat/metabat_paired.txt /data/$ASSEMBLY.bam
+	docker run -t $DOCKER_USER -v $(pwd):/data/ --rm reslp/metabat metabat2 -i /data/$ASSEMBLY -a /data/metabat/metabat_depth.txt -o metabat --sensitive -v
+fi
+
+if [[ $OPTIONS == *"concoct"* ]]; then
+	echo "(binner) Will run concoct"
+	mkdir -p concoct
+	echo "(binner) Digesting FASTA file ..."
+	docker run -t $DOCKER_USER -v $(pwd):/data/ --rm reslp/concoct cut_up_fasta.py /data/"$ASSEMBLY" -c 10000 -o 0 --merge_last -b /data/"$ASSEMBLY"_contigs_10K.bed > "$ASSEMBLY"_contigs_10K.fa
+	echo "(binner) Creating coverage table ..."
+	docker run -t $DOCKER_USER -v $(pwd):/data/ --rm reslp/concoct concoct_coverage_table.py /data/"$ASSEMBLY"_contigs_10K.bed /data/"$ASSEMBLY".bam > concoct_coverage_table.tsv
+	echo "(binner) running concoct ..."
+	docker run -t $DOCKER_USER -v $(pwd):/data/ --rm reslp/concoct concoct --composition_file /data/"$ASSEMBLY"_contigs_10K.fa --coverage_file /data/concoct_coverage_table.tsv -b /data/concoct/"$ASSEMBLY"_concoct --threads $THREADS
+	echo "(binner) Merging results ..."
+	docker run $DOCKER_USER -v $(pwd):/data/ --rm reslp/concoct merge_cutup_clustering.py /data/concoct/"$ASSEMBLY"_concoct_clustering_gt1000.csv > concoct/"$ASSEMBLY"_concoct_clustering_merged.csv
+	echo "(binner) Exract FASTA chunks ..."
+	mkdir -p concoct/bins
+	docker run -t -v $(pwd):/data/ --rm reslp/concoct extract_fasta_bins.py /data/"$ASSEMBLY" /data/concoct/"$ASSEMBLY"_concoct_clustering_merged.csv --output_path /data/concoct/bins
+	cd concoct/bins
+	rename "s/^/"$ASSEMBLY"_concoct_/" *.fa
+	cd ../..
+fi
+
+if [[ $OPTIONS == *"blobtools"* ]]; then
+	echo "(binner) Will prepare for blobtools"
+	if [ -z $DIAMONDDB ]; then
+		echo "(binner) Error: Path to diamond db not set."
+		exit 1
+	fi
+	if [ -z $PROTID ]; then
+		echo "(binner) Error: Path to prot.accession2taxid not set."
+		exit 1
+	fi
+	if [ ! -f $PROTID ]; then
+		echo "(binner) Error: $PROTID does not exist. Is the path correct?"
+		exit 1
+	fi
+	if [ ! -f $DIAMONDDB".dmnd" ]; then
+		echo "(binner) Error: $DIAMONDDB.dmnd does not exist. Is the path correct?"
+		exit 1
+	fi
+	
+	echo "(binner) location of diamond db: "$DIAMONDDB
+	echo "(binner) location of prot.accession2taxid: "$PROTID
+	
+	mkdir -p blobtools
+	
+	if [ ! -f blobtools/"$ASSEMBLY"_diamond_matches ]; then
+		echo "(binner) No diamond results found. Will therefore run diamond"
+		docker run -t $DOCKER_USER -v $(pwd):/data/ -v $(dirname $DIAMONDDB):/opt/database/ --rm reslp/diamond diamond blastx -d /opt/database/$(basename $DIAMONDDB) -q /data/$ASSEMBLY -o /data/blobtools/"$ASSEMBLY"_diamond_matches -p $THREADS
+	fi
+	echo "(binner) reformatting diamond results for use with blobtools..."
+	docker run $DOCKER_USER -v $(pwd):/data/ -v $(dirname $PROTID):/opt/mapping --rm reslp/get_taxids /opt/mapping/prot.accession2taxid /data/blobtools/"$ASSEMBLY"_diamond_matches > blobtools/"$ASSEMBLY"_diamond_matches_formatted
+	echo "(binner) Running blobtools"
+	docker run -t $DOCKER_USER -v $(pwd):/data/ --rm reslp/blobtools create -i /data/$ASSEMBLY -b /data/$ASSEMBLY.bam -t /data/blobtools/"$ASSEMBLY"_diamond_matches_formatted -o /data/blobtools/"$ASSEMBLY"_blobtools
+	docker run -t $DOCKER_USER -v $(pwd):/data/ --rm reslp/blobtools view -i /data/blobtools/"$ASSEMBLY"_blobtools.blobDB.json -o /data/blobtools/
+	docker run -t $DOCKER_USER -v $(pwd):/data/ --rm reslp/blobtools plot -i /data/blobtools/"$ASSEMBLY"_blobtools.blobDB.json -o /data/blobtools/
+	echo "(binner) extracting contigs from blobtools"
+	cp $ASSEMBLY blobtools/
+	cd blobtools
+	docker run -t $DOCKER_USER -v $(pwd):/data/ --rm reslp/extract_contigs /data/"$ASSEMBLY" /data/"$ASSEMBLY"_blobtools.blobDB.table.txt
+	rm $ASSEMBLY
+	cd ..
+fi
+
