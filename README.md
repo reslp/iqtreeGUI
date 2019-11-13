@@ -11,7 +11,7 @@ iqtreeGUI is a graphical front-end for [IQ-TREE](http://www.iqtree.org). The goa
 
 
 ![Screenshot of iqtreeGUI](screenshot.png)
-*Figure: iqtreeGUi running on MacOS High Sierra*
+*Figure: iqtreeGUi running on MacOS 10.14*
 
 A work in progress
 ==============
