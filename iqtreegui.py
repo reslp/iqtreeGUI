@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 #written by Philipp Resl
 #this is the python3 version of iqtreegui
 
@@ -15,7 +15,7 @@ import unicodedata
 from tkinter import *
 import tkinter.filedialog, tkinter.messagebox
 from tkinter.scrolledtext import ScrolledText
-import tkinter.ttk as ttk
+from tkinter.ttk import *
 import platform
 from os.path import expanduser
 from shutil import copy, rmtree
@@ -23,20 +23,8 @@ from shutil import copy, rmtree
 
 # import iqtreegui modules
 import iqtree_gui_support
-from model_select import *
-from partition import *
-from ScrollableFrame import *
-from iqtree_out import *
-from settings import *
-from advanced_bootstrap import *
-from data_types_settings import *
-from iqtree_settings import *
-from treesearch_settings import *
-from modelselect_settings import *
-from consensustree import *
-from robinsonfoulds import *
-from randomtree import *
-from alignment import *
+import iqtgui_modules as iqtg
+
 
 def resource_path(relative): #needed to load iqtreeGUI icon
 	if hasattr(sys, '_MEIPASS'):
@@ -45,7 +33,8 @@ def resource_path(relative): #needed to load iqtreeGUI icon
 	#return os.path.join(os.environ.get("_MEIPASS2",os.path.abspath(".")),relative)
 	
 ###### main class #######
-class iqtree_GUI(Frame):
+class iqtree_GUI(Tk):
+#class iqtree_GUI(Frame):
 	nthreads = "AUTO"
 	nbootstrap = 1000
 	overwrite=1
@@ -69,12 +58,13 @@ class iqtree_GUI(Frame):
 	
 	is_models_set = False
 	
+	
 	# initialize advanced settings types
-	advanced_bs_settings = BootstrapConfig()
-	treesearch_settings = TreeSearchSettings()
-	iqtree_settings = IQtreeSettings()
-	gui_settings = IQtreeGUIConfig()
-	advanced_model_settings	= AutomaticModelSelectionSettings()
+	advanced_bs_settings =  iqtg.data_types_settings.BootstrapConfig()
+	treesearch_settings = iqtg.data_types_settings.TreeSearchSettings()
+	iqtree_settings = iqtg.data_types_settings.IQtreeSettings()
+	gui_settings = iqtg.data_types_settings.IQtreeGUIConfig()
+	advanced_model_settings	= iqtg.data_types_settings.AutomaticModelSelectionSettings()
 	
 
 	def convert_number(self, s): #function to distinguish between float, int and str when reading from xml file
@@ -327,24 +317,23 @@ class iqtree_GUI(Frame):
 	
 	def spawn_consensus_tree_window(self):
 		consensus_window=Toplevel()
-		consensus = ConsensusTreeWindow(consensus_window, self.gui_settings)
+		consensus = iqtg.special.consensustree.ConsensusTreeWindow(consensus_window, self.gui_settings)
 		self.master.wait_window(consensus_window)
 	
 	def spawn_robionsonfoulds_window(self):
 		robinson_window=Toplevel()
-		robinson = RobinsonFouldsWindow(robinson_window, self.gui_settings)
+		robinson = iqtg.special.robinsonfoulds.RobinsonFouldsWindow(robinson_window, self.gui_settings)
 		self.master.wait_window(robinson_window)
 	
 	def spawn_model_selection_window(self):
 		settings_window=Toplevel()
-		settings = ModelselectionSettingsWindow(settings_window, self.advanced_model_settings)
+		settings = iqtg.modelselect_settings.ModelselectionSettingsWindow(settings_window, self.advanced_model_settings)
 		self.master.wait_window(settings_window)
-		
 	
 	def spawn_settings_window(self):
 		print("settings")
 		settings_window=Toplevel(self.master)
-		settings = SettingsWindow(settings_window, self.gui_settings, self.config_path)
+		settings = iqtg.settings.SettingsWindow(settings_window, self.gui_settings, self.config_path)
 		self.master.wait_window(settings_window)
 		self.read_config_file()
 		# self.info_label.insert(END, self.get_time()+"New configuration file loaded\n")
@@ -353,21 +342,21 @@ class iqtree_GUI(Frame):
 	def spawn_advanced_bootstrap_window(self):
 		print("advanced bootstrap settings")
 		settings_window=Toplevel()
-		settings = AdvancedBSWindow(settings_window, self.advanced_bs_settings)
+		settings = iqtg.bootstrap_settings.AdvancedBSWindow(settings_window, self.advanced_bs_settings)
 		self.master.wait_window(settings_window)
 		# self.info_label.insert(END, self.get_time()+"Advanced Bootstrap are: \n")
 		# self.info_label.insert(END, "bcor=" + str(self.advanced_bs_settings.bcor) + ", beps=" + str(self.advanced_bs_settings.beps)+", nm=" + str(self.advanced_bs_settings.nm)+", nstep=" + str(self.advanced_bs_settings.nstep)+", bnni=" + str(self.advanced_bs_settings.bnni)+", wbt=" + str(self.advanced_bs_settings.wbt)+", wbtl=" + str(self.advanced_bs_settings.wbtl)+"\n")
 	
 	def spawn_iqtree_settings_window(self):
 		settings_window=Toplevel()
-		settings = IQtreeSettingsWindow(settings_window, self.iqtree_settings)
+		settings = iqtg.iqtree_settings.IQtreeSettingsWindow(settings_window, self.iqtree_settings)
 		self.master.wait_window(settings_window)
 		# self.info_label.insert(END, self.get_time()+"IQTree settings are:\n")
 		# self.info_label.insert(END, self.get_time()+self.iqtree_settings.get_values())
 		
 	def spawn_treesearch_settings_window(self):
 		settings_window=Toplevel()
-		settings = TreesearchSettingsWindow(settings_window,self.treesearch_settings)
+		settings = iqtg.treesearch_settings.TreesearchSettingsWindow(settings_window,self.treesearch_settings)
 		self.master.wait_window(settings_window)
 		# self.info_label.insert(END, self.get_time()+"Treesearch parameters are:\n")
 		# self.info_label.insert(END, self.get_time()+self.treesearch_settings.get_values())
@@ -383,11 +372,12 @@ class iqtree_GUI(Frame):
 		if "Windows" in platform.system():
 			filename = filename.replace("/","\\")
 		if filename != "" and filename != "no file name":
-			self.alignments.append(Alignment(self.alignment_scroll_frame, align_id="Alignment "+str(len(self.alignments)+1)+":  ", path = filename, number=len(self.alignments)+1, alignment_list = self.alignments, info_label=self.alignment_info_label))
+			self.alignments.append(iqtg.alignment.Alignment(self.alignment_scroll_frame, align_id="Alignment "+str(len(self.alignments)+1)+":  ", path = filename, number=len(self.alignments)+1, alignment_list = self.alignments, info_label=self.alignment_info_label))
 			self.alignments[-1].grid(sticky=W)
 			self.align_offset += 30
 			self.alignment_scroll_frame.update()
 			self.alignment_info_label.config(text="Alignments: %s Alignment(s) loaded" % str(len(self.alignments)))
+		#self.update()
 	
 
 	def create_partition(self):
@@ -397,7 +387,7 @@ class iqtree_GUI(Frame):
 			tkinter.messagebox.showerror("Error", "First specify at least one alignment.")
 			return
 		print(alignment_names)
-		self.align_partitions.append(Partition(self.partitions_set_frame, part_id="Partition "+str(len(self.align_partitions)+1)+"  ", alignments = alignment_names, number = len(self.align_partitions)+1))
+		self.align_partitions.append(iqtg.partition.Partition(self.partitions_set_frame, part_id="Partition "+str(len(self.align_partitions)+1)+"  ", alignments = alignment_names, number = len(self.align_partitions)+1))
 		self.align_partitions[-1].grid()
 		self.partitions_set_frame.update()
 		self.partition_info_label.config(text="Partitions: %s Partitions specified" % str(len(self.align_partitions)))
@@ -424,7 +414,7 @@ class iqtree_GUI(Frame):
 			print("create_model: single alignment")
 			if self.choice_part_option == 1: #no partitioning
 				print("create_model: no partition")
-				self.model_partitions.append(ModelSelection(self.manual_model_frame, part_id="   Alignment 1"))
+				self.model_partitions.append(iqtg.model_select.ModelSelection(self.manual_model_frame, part_id="   Alignment 1"))
 				self.model_partitions[-1].grid(sticky=W)
 				self.part_offset+=30
 				self.manual_model_frame.update()
@@ -435,7 +425,7 @@ class iqtree_GUI(Frame):
 				else:
 					print("create_model: multiple partitions")
 					for i in range(0, len(self.align_partitions)):
-						self.model_partitions.append(ModelSelection(self.manual_model_frame, part_id="   Partition %s" % str(i+1)))
+						self.model_partitions.append(iqtg.model_select.ModelSelection(self.manual_model_frame, part_id="   Partition %s" % str(i+1)))
 						self.model_partitions[-1].grid(sticky=W)
 						self.part_offset+=30
 						self.manual_model_frame.update()			
@@ -444,7 +434,7 @@ class iqtree_GUI(Frame):
 			if self.choice_part_option == 1: #no partitioning
 				print("create_model: no partitions")
 				for i in range(0, len(self.alignments)):
-					self.model_partitions.append(ModelSelection(self.manual_model_frame, part_id="   Alignment %s" % str(i+1)))
+					self.model_partitions.append(iqtg.model_select.ModelSelection(self.manual_model_frame, part_id="   Alignment %s" % str(i+1)))
 					self.model_partitions[-1].grid(sticky=W)
 					self.part_offset+=30
 					self.manual_model_frame.update()
@@ -455,7 +445,7 @@ class iqtree_GUI(Frame):
 				else:
 					print("create_model: multiple partitions")
 					for i in range(0, len(self.align_partitions)):
-						self.model_partitions.append(ModelSelection(self.manual_model_frame, part_id="   Partition %s" % str(i+1)))
+						self.model_partitions.append(iqtg.model_select.ModelSelection(self.manual_model_frame, part_id="   Partition %s" % str(i+1)))
 						self.model_partitions[-1].grid(sticky=W)
 						self.part_offset+=30
 						self.manual_model_frame.update()
@@ -712,7 +702,7 @@ class iqtree_GUI(Frame):
 					
 	def spawn_iqtree_subprocess(self, command):	
 		iqtree_out_window=Toplevel(self.master)
-		iqtree_out = IqtreeWindow(iqtree_out_window, self.gui_settings)
+		iqtree_out = iqtg.iqtree_out.IqtreeWindow(iqtree_out_window, self.gui_settings)
 		iqtree_out.send_command(command)
 		iqtree_out.spawn_process()
 		
@@ -750,14 +740,21 @@ class iqtree_GUI(Frame):
 
 	def __init__(self, top):
 		os.chdir(self.gui_settings.wd) # this is needed for the bundled mac app
-		_bgcolor = 'gray85'  # X11 color: 'gray85'
-		_fgcolor = '#000000'  # X11 color: 'black'
-		_compcolor = 'gray85' # X11 color: 'gray85'
-		_ana1color = 'gray85' # X11 color: 'gray85' 
-		_ana2color = 'gray85' # X11 color: 'gray85' 
+		#_bgcolor = 'gray85'  # X11 color: 'gray85'
+		#_fgcolor = '#000000'  # X11 color: 'black'
+		#_compcolor = 'gray85' # X11 color: 'gray85'
+		#_ana1color = 'gray85' # X11 color: 'gray85' 
+		#_ana2color = 'gray85' # X11 color: 'gray85' 
 		self.master = top
 		top.geometry("1000x593")#+330+201")
 		top.title("iqtreeGUI Alpha")
+		top.configure(background="#F0F0F0")
+		
+		# this is not needed like it is, it does not help. it needs to be changed:
+		#plain_style=Style()
+		#plain_style.configure("plain.TFrame", foreground="black", background="#F0F0F0", bordercolor="red", borderwidth=4)
+		
+		
 		#top.resizable(width=True, height=True) # set to True to enable the workaround for the disappearing buttons on Mojave
 		top.grid_rowconfigure(0, weight=1)
 		top.grid_columnconfigure(0, weight=1)
@@ -768,15 +765,17 @@ class iqtree_GUI(Frame):
 		if "Windows" in platform.system():
 			self.config_path=os.path.expanduser("~\iqtree_config.cfg")
 		
-		
 
 #### BASIC NOTEBOOK #######
-		self.notebook = ttk.Notebook(top)
-		self.notebook.bind("<ButtonRelease-1>", self.update_notebook)
+		#stylenb
+		self.notebook = Notebook(top)
+		#self.notebook.bind("<ButtonRelease-1>", self.update_notebook)
+		#print(tkinter.TkVersion)
+		#print(tkinter.TclVersion)
 		
 		# this was used due to a bug in tk/tcl
-		#if root.tk.call('tk', 'windowingsystem') == 'aqua': #change padding of notebook tabs if osx
-		#	s=ttk.Style()
+		#if root.call('tk', 'windowingsystem') == 'aqua': #change padding of notebook tabs if osx
+		#	s=tStyle()
 		#	s.configure("TNotebook.Tab", padding=(18, 8, 20, 0))
 		
 		self.notebook.grid(row=0, column=0,columnspan=10, rowspan=1, sticky=N+S+W+E)
@@ -804,7 +803,7 @@ class iqtree_GUI(Frame):
 		#self.button_run.place(relx=0.01, rely=0.93, height=26, width=102)
 		self.button_run.grid(row=1,column=0, sticky=W)
 		#self.button_run.configure(activebackground="#d9d9d9")
-		self.button_run.configure(text='''Run Analysis''', command=self.get_run_command_new)
+		self.button_run.configure(text="Run Analysis", command=self.get_run_command_new)
 		
 		cb_overwritevar = IntVar()
 		cb_overwritevar.set(1)
@@ -829,29 +828,16 @@ class iqtree_GUI(Frame):
 ########INFO#########
 		
 		self.info_frame = Frame(self.notebook)
-		#self.info_frame.grid_rowconfigure(1, weight=1)
-		#self.info_frame.grid_columnconfigure(1, weight=1)
-		#self.info_label = ScrolledText(self.info_frame)
-		#self.info_label.pack(fill=BOTH, expand=1)
-		
-		#print resource_path("icon/iqtreegui.gif")
-		#print os.path.exists(os.path.join(sys.path[0],"iqtreegui.py"))
-		#print os.path.dirname(os.path.realpath(__file__))
-		#print sys.path[0]
-		print(resource_path("/icon/iqtreegui.gif"))
-		self.img=PhotoImage(file=resource_path("/icon/iqtreegui.gif"))
-		#print self.img
+	
 		self.info_frame.columnconfigure(0, minsize=250)
 		self.info_frame.rowconfigure(0, minsize=50)
 		
-		#self.canvas = Canvas(self.info_frame, width = 300, height = 200, bg = 'yellow')
-		#self.canvas.grid(row =1,column=1)
-		#self.canvas.create_image(1, 1, image = self.img)
-		
+		#this can be uncommented if the label should be displayed. it has been disabled for testing purposes
+		self.img=PhotoImage(file=resource_path("/icon/iqtreegui.gif"))
 		self.logo_cv = Label(self.info_frame, image=self.img)
 		self.logo_cv.image = self.img
 		self.logo_cv.grid(row=1, column=1, rowspan=5, sticky=W)
-					         
+		
 		message = "iqtreeGUI - A graphical user interface for IQ-TREE.\n\nhttp://github.com/reslp/iqtreegui\n\nVersion %s \n\n" % self.gui_settings.version
 		self.label = Label(self.info_frame, text=message)
 		self.label.configure(font="Helvetica 14 bold")
@@ -896,9 +882,7 @@ class iqtree_GUI(Frame):
 		self.command_entry.insert(END, "no command yet")
 		self.command_entry.grid_forget()
 		
-		
-		
-		
+			
 		
 		#self.info_label.tag_configure("center", justify='center')
 		# self.info_label.insert(END, welcome_message)
@@ -911,6 +895,7 @@ class iqtree_GUI(Frame):
 			self.create_new_config_file()
 			## self.info_label.insert(END, self.get_time()+"No config file found. I created a new one...\n")
 		else:
+			print("Read config file...")
 			self.read_config_file()
 			
 				
@@ -920,7 +905,7 @@ class iqtree_GUI(Frame):
 
 ###ALIGNMENT########
 		## create frame for scrollbars and alignment view
-		self.alignment_frame = Frame(self.notebook)
+		self.alignment_frame = Frame(self.notebook,style="plain.TFrame")
 		self.alignment_frame.grid(sticky=N+W+S+E)
 		
 		self.alignment_frame.rowconfigure(0, minsize=30)
@@ -928,7 +913,7 @@ class iqtree_GUI(Frame):
 		self.alignment_frame.grid_rowconfigure(4,weight=1)
 		self.alignment_frame.grid_columnconfigure(1,weight=1)
 
-		self.description = tk.Label(self.alignment_frame,text="Specify alignment files (FASTA, PHYLIP, NEXUS) here: ", justify=tk.LEFT)
+		self.description = Label(self.alignment_frame,text="Specify alignment files (FASTA, PHYLIP, NEXUS) here: ", justify=LEFT)
 		self.description.configure(font="Helvetica 14 bold")
 		self.description.grid(row=1,column=1, sticky=W)
 		
@@ -936,19 +921,23 @@ class iqtree_GUI(Frame):
 		self.load_alignment_button.grid(row=2,column=1,sticky=W)
 		self.load_alignment_button.configure(text="Add alignment", command=self.add_alignment)
 		
-		self.alignment_frame_container = Frame(self.alignment_frame)
+		#bgcol = self.alignment_frame.cget("bg")
+		#print(bgcol)
+		
+		self.alignment_frame_container = Frame(self.alignment_frame, style="plain.TFrame")
 		self.alignment_frame_container.grid(row=4, column=1, columnspan=10, sticky=N+S+W+E)
-		self.alignment_scroll_frame = ScrollableFrame(self.alignment_frame_container)
+		
+		self.alignment_scroll_frame = iqtg.ScrollableFrame.ScrollableFrame(self.alignment_frame_container)
 		
 		self.notebook.add(self.alignment_frame, text="Alignment")
-		self.notebook.update_idletasks()
+		#self.notebook.update_idletasks()
 			
 
 ###Partitioning########			
 		## partitioning frame
 		self.partition_option_frame = Frame(self.notebook) #original frame
 		self.partition_option_frame.grid(sticky=N+S+W+E)
-		self.partition_option_frame.configure(relief=GROOVE)
+		#self.partition_option_frame.configure(relief=GROOVE)
 		self.partition_option_frame.columnconfigure(0, minsize=30)
 		self.partition_option_frame.rowconfigure(0, minsize=30)
 			
@@ -962,16 +951,16 @@ class iqtree_GUI(Frame):
 		self.part_set_frame_container = Frame(self.partition_option_frame)
 		self.part_set_frame_container.grid(row=4, column=2, columnspan=5, sticky=N+W+S+E)
 		
-		self.partitions_set_frame = ScrollableFrame(self.part_set_frame_container)
+		self.partitions_set_frame = iqtg.ScrollableFrame.ScrollableFrame(self.part_set_frame_container)
 		
 		self.button_create_part = Button(self.partition_option_frame)
 		self.button_create_part.grid(row=3, column=2, sticky=N)
-		self.button_create_part.configure(activebackground="#d9d9d9")
+		#self.button_create_part.configure(activebackground="#d9d9d9")
 		self.button_create_part.configure(text="Create partition", command=self.create_partition)
 		
 		self.button_delete_part = Button(self.partition_option_frame)
 		self.button_delete_part.grid(row=3,column=3, sticky=N)
-		self.button_delete_part.configure(activebackground="#d9d9d9")
+		#self.button_delete_part.configure(activebackground="#d9d9d9")
 		self.button_delete_part.configure(text="Delete partition", command=self.delete_partition)
 		
 		#initial position hidden
@@ -1006,10 +995,9 @@ class iqtree_GUI(Frame):
 		for option, val in partition_options:
 			Radiobutton(self.small_part_subframe, 
 				  text=option,
-				  padx = 10,
-				  pady = 10,
+				  padding=(10,10),
 				  variable=self.part_var,
-				  justify=LEFT,
+				  #justify=LEFT,
 				  command=ShowChoice_part,
 				  value=val).grid(column=0, sticky=W, rowspan=3)
 		
@@ -1076,7 +1064,7 @@ class iqtree_GUI(Frame):
 		
 		for option, val in model_options:
 			Radiobutton(self.small_model_subframe, 
-				  text=option, padx = 10, pady = 10,
+				  text=option, padding=(10,10),
 				  variable=self.v_model_option,
 				  command=ShowChoice_model_option,
 				  value=val).grid(column=1,sticky=W)
@@ -1087,7 +1075,7 @@ class iqtree_GUI(Frame):
 		self.model_frame_down = Frame(self.model_frame)
 		self.model_frame_down.grid(row=3, column=1, sticky=N+W+E+S)
 		
-		self.manual_model_frame = ScrollableFrame(self.model_frame_down)
+		self.manual_model_frame = iqtg.ScrollableFrame.ScrollableFrame(self.model_frame_down)
 		self.manual_model_frame.grid_forget()
 		
 		self.notebook.add(self.model_frame, text="Model")
@@ -1134,7 +1122,7 @@ class iqtree_GUI(Frame):
 		
 		for option, val in bootstrap_options:
 			Radiobutton(self.small_bs_subframe, 
-				  text=option, padx = 10, pady = 10,
+				  text=option, padding=(10,10),
 				  variable=self.v,command=ShowChoice, value=val).grid(sticky=W)
 		
 		#self.bootstrap_frame.rowconfigure(2,minsize=100)
@@ -1179,14 +1167,15 @@ class iqtree_GUI(Frame):
 		self.menubar.add_cascade(label="Special Applications", menu=self.special_menu)
 		
 		top.config(menu=self.menubar)
+		self.notebook.focus_set()
 
 if __name__ == '__main__':
+	print(os.getcwd())
+	print(platform.system())
+	os.chdir(os.path.expanduser("~"))
 	root = Tk()
+	#Style().configure("TFrame",background="#000000")
+	#style = Style(root)
+	#style.theme_use('classic')
 	top = iqtree_GUI(root)
-	#print(root.tk.exprstring('$tcl_library')) #for checking the tcl/tk version
-	#print(root.tk.exprstring('$tk_library'))
 	root.mainloop()
-
-
-	
-	#vp_start_gui()

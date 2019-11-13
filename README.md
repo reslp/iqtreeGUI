@@ -9,14 +9,21 @@ Description
 
 iqtreeGUI is a graphical front-end for [IQ-TREE](http://www.iqtree.org). The goal is to implement all features of IQ-TREE 1.6.*. It is under active development and therefore several features are still missing (eg. a GUI for likelihood mapping, topology tests). iqtreeGUI is written in Python3 and executables are available for Windows, Linux and MacOS.
 
-**Note:** In the MacOS version on MacOS 10.14 of iqtreeGUI at start some buttons and menus will not display text correctly. This is due to a bug in Tcl/Tk framework. Till the bug in Tcl/Tk gets removed, simply resize the window slightly and everythingh should look fine.
 
 ![Screenshot of iqtreeGUI](screenshot.png)
 *Figure: iqtreeGUi running on MacOS High Sierra*
 
 A work in progress
 ==============
-One of the great things about IQ-TREE is that is has lots of possibilities to combine different parameters and analyses. While iqtreeGUI aims to provide a graphical way to access all these features, it is almost impossible to test every possible combination of parameters IQ-TREE allows. At the moment iqtreeGUI is still under active developement. Therefore there may still be a large number of bugs. I am greatful for every bug report I receive. Reporting bugs will help to improve iqtreeGUI.
+One of the great things about IQ-TREE is that is has lots of possibilities to combine different parameters and analyses. While iqtreeGUI aims to provide a graphical way to access all these features, it is almost impossible to test every possible combination of parameters IQ-TREE allows. At the moment iqtreeGUI is still under active development. Therefore there may still be a large number of bugs. I am greatful for every bug report I receive. Reporting bugs will help to improve iqtreeGUI.
+
+Changelog:
+========
+
+Nov.13 2019 v(13112019): New version with many bug fixes:
+	- The pyinstaller executable for MacOS should now work properly again.
+	- The code is now better organized which removed occasional strange behavior in older versions
+	- A problem with tkinter on newer versions of MacOS caused different rendering problems. This should now be fixed as well (tested on MacOS 10.14)
 
 Features
 ===========
@@ -39,7 +46,7 @@ Currently implemented features:
 
 Obtaining and configuring iqtreeGUI
 ================
-Executables are available for Linux, MacOS and Windows. The Windows and Linux versions were built using a combination of Docker and pyinstaller. 
+Executables are available for Linux, MacOS and Windows. The Windows and Linux versions were built using a combination of Docker and [pyinstaller] (https://pyinstaller.readthedocs.io). 
 
 For iqtreeGUI to work you will also need to download and install [IQ-TREE](http://www.iqtree.org). Once you have started iqtreeGUI you will have to set the correct path to the IQ-TREE executable. Click on iqtreeGUI -> GUI settings and select the iqtree executable.
 

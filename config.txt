@@ -1,0 +1,4 @@
+[Settings]
+iqtree = iqtree111
+version = 12112019
+

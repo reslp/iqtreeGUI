@@ -7,22 +7,6 @@
 
 import sys
 
-try:
-    from tkinter import *
-except ImportError:
-    from tkinter import *
-
-try:
-    import tkinter.ttk
-    py3 = 0
-except ImportError:
-    import tkinter.ttk as ttk
-    py3 = 1
-
-def set_Tk_var():
-    global che50
-    che50 = StringVar()
-
 def init(top, gui, *args, **kwargs):
     global w, top_level, root
     w = gui
@@ -35,8 +19,8 @@ def destroy_window():
     top_level.destroy()
     top_level = None
 
-if __name__ == '__main__':
-    import iqtree_gui1
-    iqtree_gui1.vp_start_gui()
+# if __name__ == '__main__':
+#     import iqtree_gui1
+#     iqtree_gui1.vp_start_gui()
 
 
