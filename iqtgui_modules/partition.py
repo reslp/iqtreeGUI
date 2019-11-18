@@ -3,7 +3,7 @@
 # written by Philipp Resl
 import sys
 from tkinter import *
-import tkinter.ttk as ttk
+from tkinter.ttk import *
 
 class Partition(Frame):
 	partition_id = ""
