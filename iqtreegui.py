@@ -312,7 +312,7 @@ class iqtree_GUI(Tk):
 	
 	def spawn_random_tree_window(self):
 		random_window=Toplevel()
-		random = RandomTreeWindow(random_window, self.gui_settings)
+		random = iqtg.special.randomtree.RandomTreeWindow(random_window, self.gui_settings)
 		self.master.wait_window(random_window)
 	
 	def spawn_consensus_tree_window(self):
