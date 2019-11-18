@@ -230,7 +230,7 @@ class iqtree_GUI(Tk):
 				self.alignments = []
 				# now load new ones
 				for subelement in child:
-					self.alignments.append(Alignment(self.alignment_scroll_frame, align_id="Alignment "+str(len(self.alignments)+1)+":  ", path = subelement.text, number=len(self.alignments)+1))
+					self.alignments.append(iqtg.alignment.Alignment(self.alignment_scroll_frame, align_id="Alignment "+str(len(self.alignments)+1)+":  ", path = subelement.text, number=len(self.alignments)+1, alignment_list = self.alignments, info_label=self.alignment_info_label))
 					self.alignments[-1].grid(sticky=W)
 					self.align_offset += 30
 				self.alignment_scroll_frame.update()
@@ -276,7 +276,7 @@ class iqtree_GUI(Tk):
 						self.v_model_option.set(subelement.text)
 						self.choice_model_option = self.convert_number(subelement.text)
 					if subelement.tag == "model%d"%i:
-						self.model_partitions.append(ModelSelection(self.manual_model_frame, part_id="   Alignment %d" % i))
+						self.model_partitions.append(iqtg.model_select.ModelSelection(self.manual_model_frame, part_id="   Alignment %d" % i))
 						self.model_partitions[-1].grid(sticky=W)
 						self.part_offset+=30
 						for model in subelement:
