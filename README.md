@@ -44,7 +44,7 @@ Obtaining and configuring iqtreeGUI
 
 **Packaged releases:**
 
-Get the latest release [here] (https://github.com/reslp/iqtreeGUI/releases).
+Get the latest release [here](https://github.com/reslp/iqtreeGUI/releases).
 For iqtreeGUI to work you will also need to download and install [IQ-TREE](http://www.iqtree.org).  
 
 Once you have started iqtreeGUI you will have to set the correct path to the IQ-TREE executable. Click on iqtreeGUI -> GUI settings and select the iqtree executable.
@@ -59,7 +59,7 @@ This will download the complete iqtreeGUI repository, meaning that it will downl
 
 `python iqtreegui.py`
 
-**Note:** iqtreeGUI needs Python3 (tested with v.3.6.8). I recommend installing it with [Anaconda] (https://www.anaconda.com).
+**Note:** iqtreeGUI needs Python3 (tested with v.3.6.8). I recommend installing it with [Anaconda](https://www.anaconda.com).
 
 
 
