@@ -7,24 +7,15 @@ This repository contains source code and executables for a graphical user interf
 Description
 ===========
 
-iqtreeGUI is a graphical front-end for [IQ-TREE](http://www.iqtree.org). The goal is to implement all features of IQ-TREE 1.6.*. It is under active development and therefore several features are still missing (eg. a GUI for likelihood mapping, topology tests). iqtreeGUI is written in Python3 and executables are available for Windows, Linux and MacOS.
+iqtreeGUI is a graphical front-end for [IQ-TREE](http://www.iqtree.org). The goal is to implement all features of IQ-TREE 1.6.* graphically. It is under active development and therefore several features are still missing (eg. a GUI for likelihood mapping, topology tests). iqtreeGUI is written in Python3 and executables are available for Windows, Linux and MacOS.
 
 
 ![Screenshot of iqtreeGUI](screenshot.png)
 *Figure: iqtreeGUi running on MacOS 10.14*
 
-A work in progress
+Feedback appreciated
 ==============
 One of the great things about IQ-TREE is that is has lots of possibilities to combine different parameters and analyses. While iqtreeGUI aims to provide a graphical way to access all these features, it is almost impossible to test every possible combination of parameters IQ-TREE allows. At the moment iqtreeGUI is still under active development. Therefore there may still be a large number of bugs. I am greatful for every bug report I receive. Reporting bugs will help to improve iqtreeGUI.
-
-Changelog:
-========
-
-Nov.13 2019 v(13112019): New version with many bug fixes:
-
-- The pyinstaller executable for MacOS should now work properly again.
-- The code is now better organized which removed occasional strange behavior in older versions
-- A problem with tkinter on newer versions of MacOS caused different rendering problems. This should now be fixed as well (tested on MacOS 10.14)
 
 Features
 ===========
@@ -35,7 +26,7 @@ Currently implemented features:
 
 - loading alignment files, creating partitions
 - specify models for each partition (at the moment only for DNA and AA alignments)  
-- perform bootstrap resampling
+- perform bootstrap resampling (different settings)
 - advanced IQ-TREE settings (starting tree, outgroup, prefix, etc.)
 - advanced model selection settings
 - advanced tree search settings (no. of starting trees, no. of iterations, ...)
@@ -44,34 +35,40 @@ Currently implemented features:
 - calculate Robinson-Foulds distances
 - generate random trees
 
+Special features of iqtreeGUI:
+- load and save configured analyses as XML files for maximum reproducibility
+
 
 Obtaining and configuring iqtreeGUI
 ================
-Executables are available for Linux, MacOS and Windows. The Windows and Linux versions were built using a combination of Docker and [pyinstaller] (https://pyinstaller.readthedocs.io). 
 
-For iqtreeGUI to work you will also need to download and install [IQ-TREE](http://www.iqtree.org). Once you have started iqtreeGUI you will have to set the correct path to the IQ-TREE executable. Click on iqtreeGUI -> GUI settings and select the iqtree executable.
+**Packaged releases:**
 
-Another possibility is to download the complete source code using git clone:
+Get the latest release [here] (https://github.com/reslp/iqtreeGUI/releases).
+For iqtreeGUI to work you will also need to download and install [IQ-TREE](http://www.iqtree.org).  
+
+Once you have started iqtreeGUI you will have to set the correct path to the IQ-TREE executable. Click on iqtreeGUI -> GUI settings and select the iqtree executable.
+
+**Source code:**
+
+If you would like to try the latest version of iqtreeGUI with additional features (and maybe additional bugs), you can also download the complete source code:
 
 `git clone https://github.com/reslp/iqtreeGUI`
 
-This will download the complete iqtreeGUI repository, meaning that it will download the most recent version of iqtreeGUI. This version may differ from the provided binaries and may contain additional features and bugs.
-You can then start iqtreeGUI directly from the newly downloaded directory:
+This will download the complete iqtreeGUI repository, meaning that it will download the most recent version of iqtreeGUI. You can then start iqtreeGUI directly from the newly downloaded directory:
 
 `python iqtreegui.py`
 
-**Note:** iqtreeGUI needs Python3. I recommend installing [Anaconda] (https://www.anaconda.com).
+**Note:** iqtreeGUI needs Python3 (tested with v.3.6.8). I recommend installing it with [Anaconda] (https://www.anaconda.com).
 
 
 
 
 Building executables
 ===================
-If you are on Linux or MacOS you may execute the `build_all.sh` script to build iqtreeGUI for Linux and Windows. This requires pyinstaller and Docker to be installed.
 
-**Locally from source:**
+**Note:** These builing instructions are probably outdated and may not work. I will update them soon.
 
-If you would like to use the very latest version of iqtreegui you can also build an executable from source code. However, these versions are experimental and may contain additional bugs.
 
 Prerequisites to build from source:
 
@@ -79,6 +76,12 @@ Prerequisites to build from source:
 - [python](http://www.python.org) 3.6+, which comes with most Unix like systems
 - [pyinstaller](http://www.pyinstaller.org) v3.4, for creating the executable
 - git
+
+
+On MacOS you may execute the `build_all.sh` script to build iqtreeGUI for Linux, Windows and MacOS. 
+
+
+**Building iqtreeGUI locally from source:**
 
 Make sure to install and configure pyinstaller correctly for your operating system: [pyinstaller install instructions](http://pyinstaller.readthedocs.io/en/stable/installation.html)
 
