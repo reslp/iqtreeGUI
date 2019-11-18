@@ -21,14 +21,15 @@ Changelog:
 ========
 
 Nov.13 2019 v(13112019): New version with many bug fixes:
-	- The pyinstaller executable for MacOS should now work properly again.
-	- The code is now better organized which removed occasional strange behavior in older versions
-	- A problem with tkinter on newer versions of MacOS caused different rendering problems. This should now be fixed as well (tested on MacOS 10.14)
+
+- The pyinstaller executable for MacOS should now work properly again.
+- The code is now better organized which removed occasional strange behavior in older versions
+- A problem with tkinter on newer versions of MacOS caused different rendering problems. This should now be fixed as well (tested on MacOS 10.14)
 
 Features
 ===========
 
-iqtreeGUI aims to implement all features of IQ-TREE v1.6. It has been tested with v1.6.1 but it may also run with newer versions of IQ-TREE.
+iqtreeGUI aims to implement all features of IQ-TREE v1.6. It has been tested with v1.6.9 but it may also run with newer versions of IQ-TREE.
 
 Currently implemented features:
 
@@ -76,7 +77,7 @@ Prerequisites to build from source:
 
 - MacOS X, Linux or Windows operating system
 - [python](http://www.python.org) 3.6+, which comes with most Unix like systems
-- [pyinstaller](http://www.pyinstaller.org) v3.3.1, for creating the executable
+- [pyinstaller](http://www.pyinstaller.org) v3.4, for creating the executable
 - git
 
 Make sure to install and configure pyinstaller correctly for your operating system: [pyinstaller install instructions](http://pyinstaller.readthedocs.io/en/stable/installation.html)
