@@ -57,6 +57,7 @@ class ModelSelection(Frame):
 				self.rate_hetero_v.set(self.model.rate_hetero)		
 			if self.model.model_type == "Specify manually":
 				print() #not yet implemented
+				
 		if self.model.data_type == "AA":
 			self.aa_type_select.grid(row=0,column=2)
 			self.rate_hetero_select.grid(row=0,column=7)
@@ -80,15 +81,13 @@ class ModelSelection(Frame):
 				self.prot_user_scheme.delete(0,END)
 				self.prot_user_scheme.insert(END,self.model.user_scheme)
 				self.v_aa_freq.set(self.model.base_freq)
-
-			
 	
 	def create_widgets(self, part_id):
 		self.partition_label = Label(self, text=part_id)
 		self.partition_label.grid(column=0, sticky=W)
 		self.partition_label.configure(font=("TkTextFont", 12, "bold"))
 
-		data_type_options = ["DNA","AA"]#,"MORPH","SNP"]
+		data_type_options = ["Datatype","DNA","AA"]#,"MORPH","SNP"]
 		
 		self.data_type_v=StringVar()
 		self.data_type_v.set(self.model.data_type)
@@ -165,11 +164,12 @@ class ModelSelection(Frame):
 				self.model.data_type = "SNP"
 				
 			self.data_type = which
+			print("Model data type: %s" % self.data_type_v.get())
 			
 		self.data_type_select = OptionMenu(self, self.data_type_v,  *data_type_options, command=ShowChoice_data_type)
 		self.data_type_select.grid(column=1, row=0)
 
-		dna_model_options = ["Base substitution rates","Lie Markov models","Codon model"]#,"Specify manually"]
+		dna_model_options = ["Model Type", "Base substitution rates","Lie Markov models","Codon model"]#,"Specify manually"]
 
 		self.dna_type_v=StringVar()
 		self.dna_type_v.set(self.model.model_type)
@@ -213,7 +213,7 @@ class ModelSelection(Frame):
 		
 		self.dna_type_select = OptionMenu(self, self.dna_type_v,  *dna_model_options, command=ShowChoice_dna_type)
 
-		base_model_options = ["JC","F81","K80","HKY","TN","TNe","K81","K81u","TPM2","TPM2u","TPM3","TPM3u","TIM","TIMe","TIM2","TIM2e","TIM3","TIM3e","TVM","TVMe","SYM","GTR"]
+		base_model_options = ["Model","JC","F81","K80","HKY","TN","TNe","K81","K81u","TPM2","TPM2u","TPM3","TPM3u","TIM","TIMe","TIM2","TIM2e","TIM3","TIM3e","TVM","TVMe","SYM","GTR"]
 		
 		self.v_model=StringVar()
 		self.v_model.set(self.model.model)
@@ -225,7 +225,7 @@ class ModelSelection(Frame):
 	
 		self.base_model_select = OptionMenu(self, self.v_model,  *base_model_options, command=cbBaseModel)
 		
-		base_freq_options = ["+F", "+FQ", "+FO", "FIX"]
+		base_freq_options = ["Freq","+F", "+FQ", "+FO", "FIX"]
 		
 		self.v_base_freq=StringVar()
 		self.v_base_freq.set(self.model.base_freq)
@@ -244,7 +244,7 @@ class ModelSelection(Frame):
 		self.fixed_scheme.insert(END, self.model.base_fre_fixed_scheme)
 		
 		
-		li_model_prefix_options = ["RY", "WS", "MK", "None"]
+		li_model_prefix_options = ["Prefix","RY", "WS", "MK", "None"]
 		
 		self.v_li_model_prefix = StringVar()
 		self.v_li_model_prefix.set(self.model.li_model_prefix)
@@ -257,7 +257,7 @@ class ModelSelection(Frame):
 		self.li_model_prefix_select = OptionMenu(self, self.v_li_model_prefix,  *li_model_prefix_options, command=cbLiModel_prefix)
 		
 		
-		li_model_options = ["1.1","2.2b","3.3a","3.3b","3.3c","3.4","4.4a","4.4b","4.5a","4.5b","5.6a","5.6b","5.7a","5.7b","5.7c","5.11a","5.11b","5.11c","5.16","6.6","6.7a","6.7b","6.8a","6.8b","6.17a","6.17b","8.8","8.10a","8.10b","8.16","8.17","8.18","9.20a","9.20b","10.12","10.34","12.12"]
+		li_model_options = ["Model","1.1","2.2b","3.3a","3.3b","3.3c","3.4","4.4a","4.4b","4.5a","4.5b","5.6a","5.6b","5.7a","5.7b","5.7c","5.11a","5.11b","5.11c","5.16","6.6","6.7a","6.7b","6.8a","6.8b","6.17a","6.17b","8.8","8.10a","8.10b","8.16","8.17","8.18","9.20a","9.20b","10.12","10.34","12.12"]
 		
 		self.v_li_model = StringVar()
 		self.v_li_model.set(self.model.model)
@@ -269,7 +269,7 @@ class ModelSelection(Frame):
 		
 		self.li_model_select = OptionMenu(self, self.v_li_model,  *li_model_options, command=cbLiModel)
 		
-		codon_model_options = ["CODON1","CODON2","CODON3","CODON4","CODON5","CODON6","CODON9","CODON10","CODON11","CODON12","CODON13","CODON14","CODON16","CODON21","CODON22","CODON23","CODON24","CODON25"]		
+		codon_model_options = ["Model","CODON1","CODON2","CODON3","CODON4","CODON5","CODON6","CODON9","CODON10","CODON11","CODON12","CODON13","CODON14","CODON16","CODON21","CODON22","CODON23","CODON24","CODON25"]		
 		
 		self.v_codon_model = StringVar()
 		self.v_codon_model.set(self.model.model)
@@ -281,7 +281,7 @@ class ModelSelection(Frame):
 		
 		self.codon_model_select = OptionMenu(self, self.v_codon_model,  *codon_model_options, command=cbCodonModel)
 		
-		codon_subst_rate_options = ["MG","MGK","MG1KTS or MGKAP2","MG1KTV or MGKAP3","MG2K or MGKAP4","GY","GY1KTS or GYKAP2","GY1KTV or GYKAP3","GY2K or GYKAP4","ECMK07 or KOSI07","ECMrest","ECMS05 or SCHN05", "Combined"]		
+		codon_subst_rate_options = ["Subst Rate", "MG","MGK","MG1KTS or MGKAP2","MG1KTV or MGKAP3","MG2K or MGKAP4","GY","GY1KTS or GYKAP2","GY1KTV or GYKAP3","GY2K or GYKAP4","ECMK07 or KOSI07","ECMrest","ECMS05 or SCHN05", "Combined"]		
 		
 		self.v_codon_subst_rate = StringVar()
 		self.v_codon_subst_rate.set(self.model.codon_subst_rate)
@@ -299,7 +299,7 @@ class ModelSelection(Frame):
 		self.codon_subs_scheme = Entry(self)
 		self.codon_subs_scheme.insert(END, self.model.user_scheme)
 		
-		aa_model_options = ["AA exchange rate matrices","Mixture Models"]#,"User-defined"]
+		aa_model_options = ["Model Type", "AA exchange rate matrices","Mixture Models"]#,"User-defined"]
 
 		self.aa_type_v=StringVar()
 		self.aa_type_v.set(self.model.model_type)
@@ -324,7 +324,7 @@ class ModelSelection(Frame):
 		self.aa_type_select = OptionMenu(self, self.aa_type_v,  *aa_model_options, command=ShowChoice_aa_type)
 		
 		
-		aa_exchange_model_options = ["BLOSUM62","cpREV","Dayhoff","DCMut","FLU","HIVb","HIVw","JTT","JTTDCMut","LG","mtART","mtMAM","mtREV","mtZOA","mtMet","mtVer","mtInv","Poisson","PMB","rtREV","VT","WAG","GTR20"]
+		aa_exchange_model_options = ["Model", "BLOSUM62","cpREV","Dayhoff","DCMut","FLU","HIVb","HIVw","JTT","JTTDCMut","LG","mtART","mtMAM","mtREV","mtZOA","mtMet","mtVer","mtInv","Poisson","PMB","rtREV","VT","WAG","GTR20"]
 
 		self.aa_exchange_type_v=StringVar()
 		self.aa_exchange_type_v.set(self.model.model)
@@ -338,7 +338,7 @@ class ModelSelection(Frame):
 		self.aa_exchange_type_select = OptionMenu(self, self.aa_exchange_type_v,  *aa_exchange_model_options, command=ShowChoice_aa_exchange_type)
 		
 		
-		aa_mixture_model_options = ["C10","C20","C30","C40","C50","C60","EX2","EX3","EHO","UL2","UL3","EX_EHO","LG4M","LG4X","CF4"]
+		aa_mixture_model_options = ["Mix.Opt","C10","C20","C30","C40","C50","C60","EX2","EX3","EHO","UL2","UL3","EX_EHO","LG4M","LG4X","CF4"]
 
 		self.aa_mixture_type_v=StringVar()
 		self.aa_mixture_type_v.set(self.model.aa_mixture_option)
@@ -355,7 +355,7 @@ class ModelSelection(Frame):
 		self.prot_user_scheme.insert(END, self.model.user_scheme)
 		
 		
-		aa_freq_options = ["+F", "+FQ", "+FO"]#, "FIX"]
+		aa_freq_options = ["Freq","+F", "+FQ", "+FO"]#, "FIX"]
 		
 		self.v_aa_freq=StringVar()
 		self.v_aa_freq.set(self.model.base_freq)
@@ -375,7 +375,7 @@ class ModelSelection(Frame):
 		self.fixed_aa_scheme.insert(END, "Enter Scheme")
 
 	
-		morph_model_options = ["JC2","GTR2","MK","ORDERED"]
+		morph_model_options = ["Model","JC2","GTR2","MK","ORDERED"]
 
 		morph_type_v=StringVar()
 		morph_type_v.set("Model")
@@ -406,20 +406,37 @@ class ModelSelection(Frame):
 		
 
 
-	def get_model(self): #this will be the function to return which model is used
+	def get_model(self): #this is the function to return the used model
 		print("Returning model...")
-		if self.model.rate_hetero=="Rate Heterog.":
-			self.model.rate_hetero = ""
+		model = ""	
 		if self.model.data_type == "DNA":
 			if self.model.model_type == "Base substitution rates":
-				model = self.model.model + self.model.base_freq + self.model.rate_hetero
+				if self.model.model == "Model":
+					return "invalid DNA model"
+				else:
+					model = self.model.model
+				if self.model.base_freq == "Freq":
+					model = model
+				else:
+					model += self.model.base_freq
+				if self.model.rate_hetero == "Rate Heterog.":
+					model = model
+				else:
+					model += self.model.rate_hetero
+				#model = self.model.model + self.model.base_freq + self.model.rate_hetero
 				print("Model will be: %s" % model)
 				return model
 			if self.model.model_type == "Lie Markov models":
-				if self.model.li_model_prefix == "Prefix" or self.model.li_model_prefix == "None":
-					model = self.model.model + self.model.rate_hetero
-				else: 
-					model = self.model.li_model_prefix + self.model.model + self.model.rate_hetero
+				if self.model.model=="Model":
+					return "invalid DNA model"
+				if self.model.li_model_prefix == "Prefix":
+					model = self.model.model
+				else:
+					model = self.model.li_model_prefix +" "+ self.model.model
+				if self.model.rate_hetero == "Rate Heterog.":
+					model = model
+				else:
+					model += self.model.rate_hetero
 				print("Model will be: %s" % model)
 				return model
 			if self.model.model_type == "Codon model":
@@ -427,6 +444,8 @@ class ModelSelection(Frame):
 				return model
 			else:
 				return "invalid DNA model"
+				
+				
 		if self.model.data_type == "AA":
 			if self.model.model_type == "AA exchange rate matrices":
 				model = self.model.model + self.model.base_freq + self.model.rate_hetero

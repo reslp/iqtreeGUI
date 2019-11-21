@@ -544,7 +544,7 @@ class iqtree_GUI(Tk):
 					if "invalid" in self.model_partitions[0].get_model():
 						tkinter.messagebox.showerror("Error", "Specified model for Partition 1 " + self.model_partitions[0].get_model())
 					else:
-						partition_command += "charpartition mine = " + self.model_partitions[0].get_model() +":part1;"
+						partition_command += "charpartition mine=" + self.model_partitions[0].get_model() +":part1;"
 					partition_command += "\nend;\n"
 			## add model parameters for multiple partition	
 			if self.choice_part_option == 2:
@@ -913,7 +913,7 @@ class iqtree_GUI(Tk):
 		self.alignment_frame.grid_rowconfigure(4,weight=1)
 		self.alignment_frame.grid_columnconfigure(1,weight=1)
 
-		self.description = Label(self.alignment_frame,text="Specify alignment files (FASTA, PHYLIP, NEXUS) here: ", justify=LEFT)
+		self.description = Label(self.alignment_frame,text="Specify alignment files (FASTA) here: ", justify=LEFT)
 		self.description.configure(font="Helvetica 14 bold")
 		self.description.grid(row=1,column=1, sticky=W)
 		
