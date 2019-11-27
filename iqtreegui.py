@@ -65,7 +65,7 @@ class iqtree_GUI(Tk):
 	iqtree_settings = iqtg.data_types_settings.IQtreeSettings()
 	gui_settings = iqtg.data_types_settings.IQtreeGUIConfig()
 	advanced_model_settings	= iqtg.data_types_settings.AutomaticModelSelectionSettings()
-	
+	anc_settings = iqtg.data_types_settings.AncSeqSettings()
 
 	def convert_number(self, s): #function to distinguish between float, int and str when reading from xml file
 		try:
@@ -324,6 +324,11 @@ class iqtree_GUI(Tk):
 		robinson_window=Toplevel()
 		robinson = iqtg.special.robinsonfoulds.RobinsonFouldsWindow(robinson_window, self.gui_settings)
 		self.master.wait_window(robinson_window)
+		
+	def spawn_ancseqs_window(self):
+		ancseqs_window=Toplevel()
+		ancseqs = iqtg.special.ancseq.AncSeqWindow(ancseqs_window, self.gui_settings, self.anc_settings)
+		self.master.wait_window(ancseqs_window)
 	
 	def spawn_model_selection_window(self):
 		settings_window=Toplevel()
@@ -672,6 +677,17 @@ class iqtree_GUI(Tk):
 				command += "-sp "+analysis_dir+separator+"partitions.nex "
 			else:
 				command += "-spp "+analysis_dir+separator+"partitions.nex " #standard	
+		
+		## check if ancestral seq reconstruction should be performed
+		
+		if self.anc_settings.set == 1:
+			if self.anc_settings.anc != "":
+				command += self.anc_settings.anc
+			if self.anc_settings.tree != "":
+				command += self.anc_settings.tree
+			if self.anc_settings.ppcut != "":
+				command += self.anc_settings.ppcut
+			
 		
 		##get additional settings for automatic model selection:
 		if self.choice_model_option == 1:
@@ -1160,7 +1176,7 @@ class iqtree_GUI(Tk):
 		self.special_menu = Menu(self.menubar, tearoff=0)
 		self.special_menu.add_command(label="Create Consensus tree", command=self.spawn_consensus_tree_window)
 		self.special_menu.add_command(label="Likelihood mapping", command=self.not_yet)
-		self.special_menu.add_command(label="Ancestral Seq Reconstruction", command=self.not_yet)
+		self.special_menu.add_command(label="Ancestral Seq Reconstruction", command=self.spawn_ancseqs_window)
 		self.special_menu.add_command(label="Topology Tests", command=self.not_yet)
 		self.special_menu.add_command(label="Robinson-Foulds", command=self.spawn_robionsonfoulds_window)
 		self.special_menu.add_command(label="Generate random trees", command=self.spawn_random_tree_window)

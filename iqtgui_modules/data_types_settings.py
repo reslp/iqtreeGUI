@@ -6,7 +6,7 @@ from os.path import expanduser
 class IQtreeGUIConfig:
 	def __init__(self):
 		self.wd = expanduser("~")
-		self.version = "18112019"
+		self.version = "27112019"
 		self.iqtree_path = "iqtree"
 		self.analysisname = "analysis"
 
@@ -22,6 +22,13 @@ class Model:
 		self.aa_mixture_option = "Mix.Opt."
 		self.user_scheme = "Enter Scheme"
 		self.rate_hetero = "Rate Heterog."
+		
+class AncSeqSettings:
+	def __init__(self):
+		self.set = 0
+		self.tree = ""
+		self.ppcut = ""
+		self.anc = ""
 					
 class BootstrapConfig:
 	def __init__(self):
