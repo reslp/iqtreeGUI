@@ -190,7 +190,7 @@ class iqtree_GUI(Tk):
 		print("loading analysis...")
 		self.reset_partitions() # delete old partitions
 		filename = tkinter.filedialog.askopenfilename()
-		if filename is "": # return `None` if dialog closed with "cancel".
+		if filename == "": # return `None` if dialog closed with "cancel".
 			return
 		try:
 			tree = ET.parse(filename) 
