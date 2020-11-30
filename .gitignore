@@ -1,4 +1,3 @@
-
 binner/testdata/illumina_reads_5_R1_trimmed.fq
 binner/testdata/illumina_reads_5_R2_trimmed.fq
 binner/testdata/maxbin/maxbin_bin_out.contig.tmp
@@ -36,3 +35,5 @@ binner/README.md
 dist/
 __pycache__/
 build/
+test_cases/
+.DS_Store

@@ -15,6 +15,7 @@ import shlex
 import itertools
 import signal
 import platform
+import time
 
 def iter_except(function, exception):
     try:
@@ -45,6 +46,16 @@ class IqtreeWindow():
 		self.output_label.grid(column=2,row=1)
 		self.save_button = Button(self.master, text="Save Output")
 		self.save_button.grid(column=1,row=2)
+		
+		def cancel():
+			self.process.kill()
+			self.display("RUN CANCELED BASED ON USER REQUEST")
+		
+		self.cancel = Button(self.master, text="Cancel Run", command=cancel)
+		self.cancel.grid(column=2,row=2)
+		
+		
+		
 		self.line_number = 0
 		self.checkpoints_dict = {}
 		self.checkpoints_dict["Start of run"] = self.line_number
@@ -140,7 +151,7 @@ class IqtreeWindow():
 			else:
 				self.display(line) # update GUI
 				break # display no more than one line per 40 milliseconds
-		self.master.after(40, self.update, q) # schedule next update
+		self.master.after(20, self.update, q) # schedule next update
 		
 	def close(self):
 		self.process.kill()
