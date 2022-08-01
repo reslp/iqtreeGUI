@@ -4,7 +4,7 @@ import sys
 block_cipher = None
 
 a = Analysis(['iqtreegui.py'],
-             pathex=['/Users/sinnafoch/Dropbox/Philipp/iqtreegui3'],
+             pathex=['/Users/sinnafoch/Dropbox/Philipp/iqtreeGUI'],
              binaries=[],
              datas=[("./config.txt","."), ("./icon/iqtreegui.gif","./icon/")],
              hiddenimports=[],
