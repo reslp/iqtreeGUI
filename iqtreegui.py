@@ -764,7 +764,7 @@ class iqtree_GUI(Tk):
 		self.master = top
 		top.geometry("1000x593")#+330+201")
 		top.title("iqtreeGUI Alpha")
-		top.configure(background="#F0F0F0")
+		#top.configure(background="#F0F0F0")
 		
 		# this is not needed like it is, it does not help. it needs to be changed:
 		#plain_style=Style()
